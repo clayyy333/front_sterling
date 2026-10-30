@@ -40,7 +40,7 @@ return function(environment)
                 BackgroundColor3=Color3.fromRGB(210,24,59),BackgroundTransparency=1-opacity,BorderSizePixel=0},wash)
             create("UIGradient",{Transparency=horizontalFade},strip)
         end
-        local tween=tweenService:Create(wash,TweenInfo.new(4.2,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,true),
+        local tween=tweenService:Create(wash,TweenInfo.new(2.8,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,true),
             {Position=UDim2.fromScale(finish,y)})
         borderTweens[#borderTweens+1]=tween;tween:Play()
     end
