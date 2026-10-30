@@ -142,7 +142,9 @@ return function(app)
             if pointer and(event==pointer or event.UserInputType==Enum.UserInputType.MouseMovement)then change(event.Position.X)end
         end)
         scope:Connect(app.Services.UserInputService.InputEnded,function(event)if event==pointer then pointer=nil end end)
-        scope:Connect(input.FocusLost,function()local n=tonumber(input.Text);if n then position(n)end end)
+        local function syncPosition()local n=tonumber(input.Text);if n then position(n)end end
+        scope:Connect(input.FocusLost,syncPosition)
+        scope:Connect(input:GetPropertyChangedSignal("Text"),syncPosition)
         return input
     end
     function ui:Select(parent,scope,title,options,choose)

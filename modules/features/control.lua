@@ -36,10 +36,28 @@ return function(app)
                 elseif id=="speed"then
                     local c=flows.Velocidad
                     local defaults=c:GetDefaults()or{}
-                    ui:Number(stack,scope,"Velocidad al caminar",c.DesiredWalkSpeed or defaults.WalkSpeed or 16,function(n)return c:SetWalkSpeed(n)end)
-                    ui:Number(stack,scope,"Fuerza del salto",defaults.JumpPower or 50,function(n)return c:SetJump(n)end)
-                    ui:Action(stack,scope,"Restaurar velocidad",function()local _,msg=c:RestoreWalkSpeed();status.Text="Velocidad: "..tostring(msg)end)
-                    ui:Action(stack,scope,"Restaurar salto",function()c:RestoreJump();status.Text="Salto restaurado."end)
+                    local function adjustable(title,value,maximum,setter,restore)
+                        local input=ui:Range(stack,scope,title,value,0,maximum,setter)
+                        local row=input.Parent
+                        for _,child in ipairs(row:GetChildren())do
+                            if child:IsA("TextLabel")then child.Size=UDim2.new(.48,-8,0,32)end
+                        end
+                        input.Position=UDim2.fromScale(.48,0);input.Size=UDim2.new(.22,-6,0,32)
+                        local reset=ui:Button(row,"Restaurar")
+                        reset.Position=UDim2.fromScale(.7,0);reset.Size=UDim2.new(.3,0,0,32);reset.TextSize=11
+                        scope:Connect(reset.Activated,function()
+                            local ok,result=restore()
+                            if ok then input.Text=tostring(result);status.Text=title..": restaurado."
+                            else status.Text=tostring(result)end
+                        end)
+                        return input
+                    end
+                    adjustable("Velocidad al caminar",c.DesiredWalkSpeed or defaults.WalkSpeed or 16,150,
+                        function(n)return c:SetWalkSpeed(n)end,function()return c:RestoreWalkSpeed()end)
+                    local character=app.Player.Character
+                    local humanoid=character and character:FindFirstChildOfClass("Humanoid")
+                    adjustable("Fuerza del salto",humanoid and humanoid.JumpPower or defaults.JumpPower or 50,200,
+                        function(n)return c:SetJump(n)end,function()return c:RestoreJump()end)
                     ui:Players(stack,scope,"Destino de teletransporte",function(p)c:SetTarget(p)end)
                     ui:Action(stack,scope,"Ir al jugador",function()local _,msg=c:Teleport();status.Text=msg end)
                 else
