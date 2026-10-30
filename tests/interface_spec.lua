@@ -271,6 +271,13 @@ local search=find(catalog,'CatalogSearch');search.Text='Baile';search:GetPropert
 find(catalog,'Play').Activated:Fire();assert(played==12,'search filters playable items')
 textButton(catalog,'Animaciones').Activated:Fire()
 local grid=find(catalog,'CatalogGrid')
+local cardLayout=grid:FindFirstChildOfClass('UIGridLayout')
+local catalogWidth=find(catalog,'CatalogViewport').AbsoluteSize.X-10
+local spacing=app.Services.UserInputService.TouchEnabled and 4 or 6
+local targetWidth=app.Services.UserInputService.TouchEnabled and 55 or 75
+local expectedColumns=math.max(1,math.floor(catalogWidth/(targetWidth+spacing)))
+assert(math.abs(cardLayout.CellSize.X.Offset-(catalogWidth-spacing*(expectedColumns-1))/expectedColumns)<.01,'cards use the original GUI width calculation')
+
 local tiles={};for _,child in ipairs(grid:GetChildren())do if child.ClassName=='Frame'then tiles[#tiles+1]=child end end
 find(tiles[1],'Play').Activated:Fire()
 textButton(app.Window.Gui,'Caminar',true).Activated:Fire()

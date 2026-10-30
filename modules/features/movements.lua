@@ -95,7 +95,9 @@ return function(app)
                         Size=UDim2.new(1,0,1,-gridTop-footer),BackgroundTransparency=1,BorderSizePixel=0,
                         ScrollBarThickness=3,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},content)
                     local grid=ui:Create("Frame",{Name="CatalogGrid",Position=UDim2.fromOffset(2,2),Size=UDim2.new(1,-10,0,0),BackgroundTransparency=1},viewport)
-                    local layout=ui:Create("UIGridLayout",{CellPadding=UDim2.fromOffset(8,8),SortOrder=Enum.SortOrder.LayoutOrder},grid)
+                    local mobile=app.Services.UserInputService.TouchEnabled
+                    local gap=mobile and 4 or 6
+                    local layout=ui:Create("UIGridLayout",{CellPadding=UDim2.fromOffset(gap,gap),SortOrder=Enum.SortOrder.LayoutOrder},grid)
                     local items,page,version,maxPages={},1,0,1
                     local cardsScope
                     scope.Cleanups[#scope.Cleanups+1]=function()if cardsScope then cardsScope:Destroy()end end
@@ -103,42 +105,47 @@ return function(app)
                         if scope.Destroyed then return end
                         if cardsScope then cardsScope:Destroy()end;cardsScope=ui:Scope();cardsScope.OnError=scope.OnError
                         for _,child in ipairs(grid:GetChildren()) do if child:IsA("GuiObject") then child:Destroy()end end
-                        local columns=math.clamp(math.floor(math.max(180,body.AbsoluteSize.X)/112),2,6)
+                        -- Match the original catalog's device-specific card width and spacing.
+                        local width=math.max(1,viewport.AbsoluteSize.X-10)
+                        local columns=math.max(1,math.floor(width/((mobile and 55 or 75)+gap)))
+                        local cardWidth=(width-gap*(columns-1))/columns
+                        local nameHeight=math.clamp(cardWidth*.35,18,28)
+                        local footerHeight=math.clamp(cardWidth*.3,18,24)
+                        local cardHeight=cardWidth+nameHeight+footerHeight
                         local available=math.max(1,viewport.AbsoluteSize.Y-4)
-                        local cardHeight=available>=240 and math.min(142,math.floor(available/2)-8)or math.clamp(available,108,142)
-                        local rowHeight=cardHeight+8
-                        local rows=math.clamp(math.floor((available+8)/rowHeight),1,3)
+                        local rowHeight=cardHeight+gap
+                        local rows=math.max(1,math.floor((available+gap)/rowHeight))
                         local perPage=columns*rows
                         maxPages=math.max(1,math.ceil(#items/perPage));page=math.clamp(page,1,maxPages)
                         pageText.Text=page.." / "..maxPages
                         previous.TextColor3=page>1 and theme.Text or theme.Muted
                         next.TextColor3=page<maxPages and theme.Text or theme.Muted
-                        layout.CellSize=UDim2.new(1/columns,-8,0,cardHeight)
+                        layout.CellSize=UDim2.fromOffset(cardWidth,cardHeight)
                         local first=(page-1)*perPage+1
                         local visible=math.min(perPage,#items-first+1)
-                        grid.Size=UDim2.new(1,-10,0,math.max(0,math.ceil(math.max(0,visible)/columns)*rowHeight-8))
+                        grid.Size=UDim2.new(1,-10,0,math.max(0,math.ceil(math.max(0,visible)/columns)*rowHeight-gap))
                         viewport.CanvasPosition=Vector2.new(0,0)
-                        local imageHeight=cardHeight-66
+                        local imageHeight=cardWidth-(mobile and 4 or 6)
                         for index=first,math.min(#items,first+perPage-1) do
                             local item=items[index]
                             local tile=ui:Round(ui:Create("Frame",{Name="CatalogItem",BackgroundColor3=theme.Surface,BorderSizePixel=0,LayoutOrder=index},grid),10)
                             ui:Create("UIStroke",{Color=theme.Line,Transparency=.45,Thickness=1},tile)
-                            local button=ui:Create("TextButton",{Name="Play",Active=true,Text="",BorderSizePixel=0,Size=UDim2.new(1,0,1,-28),BackgroundTransparency=1},tile)
-                            ui:Create("ImageLabel",{Size=UDim2.new(1,-18,0,imageHeight),Position=UDim2.fromOffset(9,6),BackgroundTransparency=1,
+                            local button=ui:Create("TextButton",{Name="Play",Active=true,Text="",BorderSizePixel=0,Size=UDim2.new(1,0,1,-footerHeight),BackgroundTransparency=1},tile)
+                            ui:Create("ImageLabel",{Size=UDim2.new(1,-(mobile and 4 or 6),0,imageHeight),Position=UDim2.fromOffset(mobile and 2 or 3,mobile and 2 or 3),BackgroundTransparency=1,
                                 Image="rbxthumb://type="..(item.isAnimationPack and "BundleThumbnail" or "Asset").."&id="..tostring(item.bundleId or item.id).."&w=150&h=150"},button)
-                            local name=ui:Label(button,item.name,11);name.Position=UDim2.fromOffset(7,imageHeight+10);name.Size=UDim2.new(1,-14,0,28)
+                            local name=ui:Label(button,item.name,10);name.Position=UDim2.fromOffset(3,cardWidth);name.Size=UDim2.new(1,-6,0,nameHeight)
                             cardsScope:Connect(button.Activated,function()
                                 if item.isAnimationPack then animationPicker:OpenPack(item)else play(c,item)end
                                 status.Text=item.name
                             end)
-                            local fav=ui:Create("TextButton",{Text=c.IsFavorite(item.bundleId or item.id) and "★" or "☆",Size=UDim2.fromOffset(30,26),
-                                Position=UDim2.new(1,-34,1,-28),BackgroundTransparency=1,TextColor3=theme.Accent,TextSize=20},tile)
+                            local fav=ui:Create("TextButton",{Text=c.IsFavorite(item.bundleId or item.id) and "★" or "☆",Size=UDim2.fromOffset(22,footerHeight),
+                                Position=UDim2.new(1,-24,1,-footerHeight),BackgroundTransparency=1,BorderSizePixel=0,TextColor3=theme.Accent,TextSize=16},tile)
                             cardsScope:Connect(fav.Activated,function()
                                 local added=c.ToggleFavorite(item.bundleId or item.id);fav.Text=added and "★" or "☆"
                             end)
                             if id=="emotes" and not item.isAnimationPack then
-                                local add=ui:Create("TextButton",{Text="+ combo",Font=Enum.Font.Gotham,TextSize=10,TextColor3=theme.Muted,
-                                    Size=UDim2.new(1,-36,0,26),Position=UDim2.new(0,3,1,-28),BackgroundTransparency=1},tile)
+                                local add=ui:Create("TextButton",{Text="+ combo",Font=Enum.Font.Gotham,TextSize=8,TextColor3=theme.Muted,
+                                    Size=UDim2.new(1,-26,0,footerHeight),Position=UDim2.new(0,1,1,-footerHeight),BackgroundTransparency=1,BorderSizePixel=0},tile)
                                 cardsScope:Connect(add.Activated,function()
                                     if #combo>=3 then status.Text="El combo ya tiene 3 emotes.";return end
                                     combo[#combo+1]=item;status.Text="Combo: "..#combo.." / 3 · "..item.name
