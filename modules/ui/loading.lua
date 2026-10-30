@@ -24,7 +24,7 @@ return function(environment)
         Position=UDim2.new(.5,0,0,28),BorderSizePixel=0,BackgroundColor3=Color3.fromRGB(111,31,47)},card),18)
     local symbol=create("TextLabel",{Text="S",Font=Enum.Font.GothamBold,TextSize=36,
         TextColor3=Color3.fromRGB(255,230,234),BackgroundTransparency=1,Size=UDim2.fromScale(1,1)},badge)
-    local image=(environment.SterlingSource or {}).IntroImage
+    local image=(environment.SterlingSource or {}).IntroImage or "125472021271676"
     if image and tostring(image)~="" then
         image=tostring(image);if image:match("^%d+$") then image="rbxassetid://"..image end
         local art=create("ImageLabel",{Name="PresentationImage",Image=image,BackgroundTransparency=1,
@@ -37,7 +37,7 @@ return function(environment)
             Position=UDim2.fromOffset(24,y),Size=UDim2.new(1,-48,0,height),TextWrapped=true},card)
     end
     local title=label("Brand","S T E R L I N G",19,112,26);title.Font=Enum.Font.GothamBold
-    local status=label("Stage","Preparando la carga…",12,154,34);status.TextColor3=Color3.fromRGB(171,161,173)
+    local status=label("Stage","Cargando…",12,154,34);status.TextColor3=Color3.fromRGB(171,161,173)
     local track=round(create("Frame",{Position=UDim2.fromOffset(24,208),Size=UDim2.new(1,-48,0,6),
         BackgroundColor3=Color3.fromRGB(45,37,46),BorderSizePixel=0,ClipsDescendants=true},card),3)
     local fill=round(create("Frame",{Name="Progress",Size=UDim2.fromScale(0,1),
@@ -56,7 +56,7 @@ return function(environment)
         if self.Destroyed then return end
         self.Value=math.max(self.Value,math.clamp(value,0,1))
         fill.Size=UDim2.fromScale(self.Value,1)
-        percent.Text=tostring(math.floor(self.Value*100)).."%";status.Text=text or status.Text
+        percent.Text=tostring(math.floor(self.Value*100)).."%";status.Text="Cargando…"
         self:Yield()
     end
     function controller:Fail()
