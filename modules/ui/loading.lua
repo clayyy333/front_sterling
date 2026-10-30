@@ -17,11 +17,15 @@ return function(environment)
         BackgroundColor3=Color3.fromRGB(8,8,12),BackgroundTransparency=.25},gui)
     local tweenService=game:GetService("TweenService")
     local borderTweens={}
+    -- Reveal the full-size artwork like a book opening, without stretching it.
+    local book=create("Frame",{Name="BookOpening",AnchorPoint=Vector2.new(.5,.5),
+        Position=UDim2.fromScale(.5,.5),BackgroundTransparency=1,BorderSizePixel=0,ClipsDescendants=true},overlay)
+    local opening=create("NumberValue",{Name="OpeningProgress",Value=0},book)
     -- Two horizontal light washes, not a glowing outline. Contiguous one-pixel
     -- rows fade vertically; their gradients fade horizontally, with no gaps,
     -- strokes or white peaks. Only the two holders animate.
     local lights=create("Frame",{Name="EdgeLights",AnchorPoint=Vector2.new(.5,.5),
-        Position=UDim2.fromScale(.5,.5),BackgroundTransparency=1,BorderSizePixel=0,ZIndex=1},overlay)
+        Position=UDim2.fromScale(.5,.5),BackgroundTransparency=1,BorderSizePixel=0,ZIndex=1},book)
     local horizontalFade=NumberSequence.new({
         NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(.15,.87),
         NumberSequenceKeypoint.new(.35,.25),NumberSequenceKeypoint.new(.5,0),
@@ -46,7 +50,7 @@ return function(environment)
     end
     local card=round(create("Frame",{Name="LoadingCard",ZIndex=2,AnchorPoint=Vector2.new(.5,.5),
         Position=UDim2.fromScale(.5,.5),BorderSizePixel=0,ClipsDescendants=true,
-        BackgroundColor3=Color3.fromRGB(20,16,23)},overlay),18)
+        BackgroundColor3=Color3.fromRGB(20,16,23)},book),18)
     local image=tostring((environment.SterlingSource or {}).IntroImage or "125472021271676")
     if image:match("^%d+$")then image="rbxassetid://"..image end
     round(create("ImageLabel",{Name="PresentationImage",Image=image,BackgroundTransparency=1,
@@ -89,12 +93,18 @@ return function(environment)
     local controller={Cancelled=false,Destroyed=false,Value=0}
     local connections={}
     connections[#connections+1]=close.Activated:Connect(function()controller.Cancelled=true;controller:Destroy()end)
+    local bookWidth,bookHeight=0,0
+    local function reveal()
+        book.Size=UDim2.fromOffset(math.max(2,bookWidth*opening.Value),bookHeight+64)
+    end
+    connections[#connections+1]=opening:GetPropertyChangedSignal("Value"):Connect(reveal)
     local function layout()
         local camera=workspace.CurrentCamera
         local view=camera and camera.ViewportSize or Vector2.new(960,640)
         local width=math.min(780,view.X*.88,view.Y*.8*16/9)
         card.Size=UDim2.fromOffset(width,math.min(math.max(width*9/16,220),view.Y*.8))
         local height=card.Size.Y.Offset
+        bookWidth,bookHeight=width,height;reveal()
         lights.Size=UDim2.fromOffset(width,height)
         local size=math.clamp(math.floor(width*.058),24,44)
         title.TextSize=size;shadow.TextSize=size;depth.TextSize=size
@@ -117,6 +127,8 @@ return function(environment)
     end
     connections[#connections+1]=workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(cameraChanged)
     cameraChanged()
+    local openingTween=tweenService:Create(opening,TweenInfo.new(.8,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),{Value=1})
+    borderTweens[#borderTweens+1]=openingTween;openingTween:Play()
     local lastYield=os.clock()
     function controller:Yield(force)
         if force or os.clock()-lastYield>=.008 then run.RenderStepped:Wait();lastYield=os.clock()end

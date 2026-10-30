@@ -168,7 +168,9 @@ readfile = function(path)
         assert(named.TopWash.Position.Y.Scale==0 and named.BottomWash.Position.Y.Scale==1,'lights stay at top and bottom')
         assert(named.TopWash.BackgroundTransparency==1,'wash holder does not draw a rectangle')
         assert(#named.TopWash:GetChildren()==32,'contiguous feathering rows have no gaps or strokes')
-        assert(tweens[#tweens].Playing and tweens[#tweens].Goal.Position and not tweens[#tweens].Goal.Rotation,'only horizontal motion')
+        assert(tweens[#tweens-1].Playing and tweens[#tweens-1].Goal.Position and not tweens[#tweens-1].Goal.Rotation,'edge lights retain horizontal motion')
+        assert(named.BookOpening.ClipsDescendants and named.LoadingCard.Parent==named.BookOpening,'opening reveals fixed-size artwork through a centered mask')
+        assert(tweens[#tweens].Playing and tweens[#tweens].Goal.Value==1,'book opening runs asynchronously')
     end
     assert(sources[relative], "not found: " .. path)
     return sources[relative]
