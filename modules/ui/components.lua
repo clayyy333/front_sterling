@@ -27,7 +27,6 @@ return function(app)
             BackgroundColor3 = accent and theme.Accent or theme.Raised,
             BorderSizePixel = 0, AutoButtonColor = true, Active = true,
         }, parent), 9)
-        self:Create("UIStroke", {Color=accent and theme.Accent or theme.Line, Thickness=1, Transparency=.45}, button)
         return button
     end
     function ui:Section(parent, title, subtitle)

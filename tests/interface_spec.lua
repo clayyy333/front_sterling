@@ -44,7 +44,12 @@ NumberSequence={new=function(v)return v end}
 NumberSequenceKeypoint={new=function(t,v)return {Time=t,Value=v}end}
 ColorSequence={new=function(v)return v end}
 ColorSequenceKeypoint={new=function(t,v)return {Time=t,Value=v}end}
-Color3 = {fromRGB = function(...) return {...} end}
+local colors={}
+Color3 = {fromRGB = function(...)
+    local values={...};local key=table.concat(values,",")
+    if not colors[key]then colors[key]=values end
+    return colors[key]
+end}
 TweenInfo={new=function(...)return {...}end}
 Enum = {
     ApplyStrokeMode={Border=1},
@@ -77,7 +82,9 @@ function object.__index(self, key)
     return self._values[key]
 end
 function object.__newindex(self, key, value)
+    local previous=self._values[key]
     self._values[key] = value
+    if key:find("Color3",1,true)and previous~=value and self._signals[key]then self._signals[key]:Fire()end
     if key == "Parent" and value then value._children[#value._children + 1] = self end
 end
 function object:GetPropertyChangedSignal(name)
@@ -332,7 +339,18 @@ for _,item in ipairs(app.Window.Gui:GetDescendants())do
     if item.Name=='SoftRed'or item.Name=='SoftShade'then assert(item.BackgroundColor3==app.Theme.Accent,'every glow follows the theme accent')end
     if item.Name=='Wordmark'then assert(item.TextStrokeTransparency==1,'wordmark has no harsh outline')end
 end
-app.Appearance:SetTheme('Red');app.Appearance:SetTransparency(0)
+for _,id in ipairs({'Red','FrostedGlass','Dark','Light','Red'})do
+    app.Appearance:SetTheme(id)
+    assert(app.Window.Frame.BackgroundColor3==app.Theme.Surface,'window follows round-trip themes')
+    for _,item in ipairs(app.Window.Gui:GetDescendants())do
+        if item.Name=='SoftRed'or item.Name=='SoftShade'then assert(item.BackgroundColor3==app.Theme.Accent,'glow survives repeated theme changes')end
+        if item.Name=='Wordmark'then assert(item.TextColor3==app.Theme.Text,'title remains readable after theme changes')end
+    end
+end
+for _,button in pairs(app.Navigation.Buttons)do
+    for _,child in ipairs(button:GetChildren())do assert(child.ClassName~='UIStroke','navigation buttons have no clipped outlines')end
+end
+app.Appearance:SetTransparency(0)
 movement.EnsureLoaded,movement.Context=oldEnsure,oldContext
 app.Navigation:Reload('movimientos')
 for _, page in pairs(app.Navigation.Pages)do
