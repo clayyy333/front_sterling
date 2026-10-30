@@ -17,7 +17,7 @@ return function(app)
             for row=0,47 do
                 local distance=row+.5-24
                 local strip=ui:Create("Frame",{Name="SoftRed",BorderSizePixel=0,Size=UDim2.new(1,0,0,1),
-                    Position=UDim2.fromOffset(0,row),BackgroundColor3=Color3.fromRGB(210,24,59),
+                    Position=UDim2.fromOffset(0,row),BackgroundColor3=app.Theme.Accent,
                     BackgroundTransparency=1-.48*math.exp(-((distance/10)^2))},wash)
                 ui:Create("UIGradient",{Transparency=fade},strip)
             end

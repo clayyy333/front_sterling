@@ -69,7 +69,7 @@ function object.__index(self, key)
         return v(size.X.Scale * parent.X + size.X.Offset, size.Y.Scale * parent.Y + size.Y.Offset)
     end
     if key == "AbsolutePosition" then return v(0, 0) end
-    if key == "Activated" or key == "InputBegan" or key == "DescendantAdded" or key=="Destroying" or key=="FocusLost" then
+    if key == "Activated" or key == "InputBegan" or key == "DescendantAdded" or key=="Destroying" or key=="FocusLost" or key=="ChildAdded" then
         if not self._signals[key] then self._signals[key] = signal() end
         return self._signals[key]
     end
@@ -139,7 +139,7 @@ local services = {TweenService=tweenService,
         error("no saved file")
     end, JSONEncode = function() return "preferences" end},
 }
-game = {GetService = function(_, name) return services[name] end}
+game = {GameId=4540138978,GetService = function(_, name) return services[name] end}
 local environment = {SterlingSource = {LocalRoot = "front_sterling"}}
 environment.__VR7_CONTACT_ADJUSTABLE_CLEANUP=function()error('original GUI must remain untouched')end
 environment.__VR7_CONTACT_FLING_CLEANUP=environment.__VR7_CONTACT_ADJUSTABLE_CLEANUP
@@ -297,6 +297,28 @@ textButton(find(app.Window.Gui,'AnimationPicker'),'×').Activated:Fire()
 
 assert(find(app.Window.Gui,'Wordmark')and not find(app.Window.Gui,'Monogram'),'header uses styled name')
 assert(app.Navigation.Buttons.movimientos.TextColor3==app.Theme.AccentText,'selected button text uses warm white')
+fake.Settings.speed=1;fake.Settings.loopEmote=true;fake.Settings.stopOnWalk=true
+fake.ApplySpeedToAllTracks=function()fake.SpeedApplied=true end
+fake.SaveLocalData=function()fake.PreferencesSaved=true end
+app.Navigation:Show('settings')
+local preferences=app.Navigation.Pages.settings
+assert(textButton(preferences,'Mostrar barra de reproducción'),'requested playback setting is present')
+for _,item in ipairs(preferences:GetDescendants())do
+    if type(item.Text)=='string'then
+        assert(not item.Text:find('AntiAFK',1,true)and not item.Text:find('Atajo de usuarios',1,true)and not item.Text:find('combo',1,true),'excluded settings cannot be shown')
+    end
+end
+local sliderCount=0
+for _,item in ipairs(preferences:GetDescendants())do if item.Name=='Slider'then sliderCount=sliderCount+1 end end
+assert(sliderCount==2,'transparency and emote speed both have sliders')
+app.Appearance:SetTheme('Blue');assert(app.Storage.Values.ColorTheme=='Blue'and app.Window.Frame.BackgroundColor3==app.Theme.Surface,'theme updates existing surfaces and persists')
+app.Appearance:SetTransparency(40);assert(app.Window.Frame.BackgroundTransparency==.4 and app.Storage.Values.GUITransparency==.4,'transparency applies and persists')
+assert(find(app.Window.Gui,'Wordmark').TextTransparency~= .4,'transparency leaves lettering readable')
+local audios=new('Folder');audios.Name='Audios';audios.Parent=workspace
+local ambience=new('Sound');ambience.Name='Environment_City_Night';ambience.Volume=.6;ambience.Parent=audios
+assert(app.Flows.Audio:SetEnabled(false)and ambience.Volume==0,'sound option uses original ambient muting')
+assert(app.Flows.Audio:SetEnabled(true)and ambience.Volume==.6,'enabling restores original sound volume')
+app.Appearance:SetTheme('Red');app.Appearance:SetTransparency(0)
 movement.EnsureLoaded,movement.Context=oldEnsure,oldContext
 app.Navigation:Reload('movimientos')
 for _, page in pairs(app.Navigation.Pages)do
@@ -316,9 +338,10 @@ app.Window.Frame.Visible=true;app.Window.Frame:GetPropertyChangedSignal('Visible
 assert(lights.Visible and tweens[#tweens].Playing,'restore resumes lights')
 local grip = find(app.Window.Gui, "Resize")
 local pointer = {UserInputType = Enum.UserInputType.Touch, Position = v(0, 0)}
+local writesBeforeResize=writes
 grip.InputBegan:Fire(pointer)
 pointer.Position = v(-100, -50);input.InputChanged:Fire(pointer);input.InputEnded:Fire(pointer)
-assert(app.Window.Frame.AbsoluteSize.X == 660 and writes == 1, "touch resizing saves only on release")
+assert(app.Window.Frame.AbsoluteSize.X == 660 and writes == writesBeforeResize+1, "touch resizing saves only on release")
 camera.ViewportSize = v(400, 700);camera:GetPropertyChangedSignal("ViewportSize"):Fire()
 assert(app.Window.Compact and app.Window.Frame.AbsoluteSize.X == 376)
 assert(app.Navigation.Buttons.home.Size.X.Offset == 108, "compact navigation must fit horizontally")

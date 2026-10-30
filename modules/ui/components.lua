@@ -4,6 +4,7 @@ return function(app)
         local object = Instance.new(class)
         for key, value in pairs(properties or {}) do object[key] = value end
         object.Parent = parent
+        if app.Appearance then app.Appearance:Register(object,properties or {})end
         return object
     end
     function ui:Round(object, radius)

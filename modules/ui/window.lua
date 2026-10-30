@@ -25,7 +25,7 @@ return function(app)
     for row=0,13 do
         local distance=row+.5-7
         local shade=ui:Create("Frame",{Name="SoftShade",Size=UDim2.new(1,0,0,1),Position=UDim2.fromOffset(0,row),
-            BorderSizePixel=0,BackgroundColor3=Color3.fromRGB(193,35,66),
+            BorderSizePixel=0,BackgroundColor3=theme.Accent,
             BackgroundTransparency=1-.25*math.exp(-((distance/3.5)^2))},wordmarkGlow)
         ui:Create("UIGradient",{Transparency=wordmarkFade},shade)
     end
@@ -35,7 +35,7 @@ return function(app)
     wordmarkShadow.Position=UDim2.fromOffset(21,12);wordmarkShadow.Size=UDim2.new(1,-132,0,32)
     local name=ui:Label(header,app.Config.Name,25)
     name.Name="Wordmark";name.Font=Enum.Font.Bodoni
-    name.TextColor3=Color3.fromRGB(255,238,246)
+    name.TextColor3=theme.Text
     name.TextStrokeColor3=Color3.fromRGB(23,10,20);name.TextStrokeTransparency=.55
     name.Position=UDim2.fromOffset(20,10);name.Size=UDim2.new(1,-132,0,32)
     local function fitWordmarkGlow()
