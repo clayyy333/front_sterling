@@ -17,6 +17,18 @@ return function(app)
         Name = "Header", Size = UDim2.new(1, 0, 0, 48), BackgroundTransparency = 1,
         BorderSizePixel = 0, Active = true,
     }, window)
+    local wordmarkGlow=ui:Create("Frame",{Name="WordmarkGlow",BackgroundTransparency=1,BorderSizePixel=0,
+        Position=UDim2.fromOffset(14,32),Size=UDim2.fromOffset(132,14)},header)
+    local wordmarkFade=NumberSequence.new({NumberSequenceKeypoint.new(0,1),
+        NumberSequenceKeypoint.new(.25,.45),NumberSequenceKeypoint.new(.5,0),
+        NumberSequenceKeypoint.new(.75,.45),NumberSequenceKeypoint.new(1,1)})
+    for row=0,13 do
+        local distance=row+.5-7
+        local shade=ui:Create("Frame",{Name="SoftShade",Size=UDim2.new(1,0,0,1),Position=UDim2.fromOffset(0,row),
+            BorderSizePixel=0,BackgroundColor3=Color3.fromRGB(193,35,66),
+            BackgroundTransparency=1-.25*math.exp(-((distance/3.5)^2))},wordmarkGlow)
+        ui:Create("UIGradient",{Transparency=wordmarkFade},shade)
+    end
     local wordmarkShadow=ui:Label(header,app.Config.Name,25)
     wordmarkShadow.Name="WordmarkShadow";wordmarkShadow.Font=Enum.Font.Garamond
     wordmarkShadow.TextColor3=Color3.fromRGB(0,0,0);wordmarkShadow.TextTransparency=.18
@@ -26,6 +38,13 @@ return function(app)
     name.TextColor3=Color3.fromRGB(255,238,246)
     name.TextStrokeColor3=Color3.fromRGB(23,10,20);name.TextStrokeTransparency=.55
     name.Position=UDim2.fromOffset(20,10);name.Size=UDim2.new(1,-132,0,32)
+    local function fitWordmarkGlow()
+        local bounds=name.TextBounds
+        local width=bounds and bounds.X>0 and bounds.X+18 or 132
+        wordmarkGlow.Size=UDim2.fromOffset(math.min(width,math.max(60,header.AbsoluteSize.X-132)),14)
+    end
+    app:Connect(name:GetPropertyChangedSignal("TextBounds"),fitWordmarkGlow)
+    app:Connect(header:GetPropertyChangedSignal("AbsoluteSize"),fitWordmarkGlow)
     local minimize = ui:Button(header, "—")
     minimize.Position = UDim2.new(1, -88, 0, 11);minimize.Size = UDim2.fromOffset(32, 32)
     local close = ui:Button(header, "×")
