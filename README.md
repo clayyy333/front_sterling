@@ -32,7 +32,7 @@ Los paneles usan pestañas compactas y botones de 32–40 px, sin tarjetas infor
 
 `main.lua` es un orquestador estable. `core/loader.lua` muestra `ui/loading.lua` antes del manifiesto y los catálogos grandes. Carga y decodifica primero emotes y después paquetes de animación, luego compila e inicializa los módulos activos. La barra avanza por etapas completadas, no por tiempo simulado. La ventana se muestra al terminar. Un error deja una presentación cerrable y reejecutar limpia la anterior.
 
-La presentación usa la imagen `125472021271676` y el texto fijo «Cargando…». `SterlingSource.IntroImage` permite configurar un ID de imagen sin esperar a su descarga para continuar la carga.
+La presentación usa la imagen `125472021271676` como fondo completo con recorte proporcional, el título «STEFFANIA», el subtítulo «La madrina sterling» y «Cargando...» abajo a la izquierda. La barra queda cerca del borde inferior y el porcentaje a la derecha. Para el arte final se recomienda una imagen horizontal de 1920 × 1080; en pantallas estrechas se adapta el encuadre sin deformar la imagen. `SterlingSource.IntroImage` permite configurar un ID de imagen sin esperar a su descarga para continuar la carga.
 
 Los motores de Movimientos se inicializan al abrir su página y reutilizan los catálogos ya preparados, sin volver a descargarlos ni decodificarlos. El buscador cede fotogramas durante el filtrado y únicamente crea las miniaturas de la página visible. Cambiar de pestaña elimina sus conexiones y cancelar una búsqueda invalida su resultado anterior.
 

@@ -40,11 +40,13 @@ UDim2 = {new = function(xs, xo, ys, yo) return {X = UDim.new(xs, xo), Y = UDim.n
 function UDim2.fromOffset(x, y) return UDim2.new(0, x, 0, y) end
 function UDim2.fromScale(x, y) return UDim2.new(x, 0, y, 0) end
 math.clamp = function(n, low, high) return math.max(low, math.min(high, n)) end
+NumberSequence={new=function(v)return v end}
+NumberSequenceKeypoint={new=function(t,v)return {Time=t,Value=v}end}
 Color3 = {fromRGB = function(...) return {...} end}
 Enum = {
     KeyCode = {W=1,S=2,A=3,D=4,Space=5,LeftControl=6,C=7,LeftShift=8},
-    Font = {Gotham = 1, GothamBold = 2, GothamMedium = 3},
-    TextXAlignment = {Left = 1}, TextYAlignment = {Top = 1},
+    Font = {Gotham = 1, GothamBold = 2, GothamMedium = 3, Garamond=4},
+    ScaleType={Crop=1}, TextXAlignment = {Left = 1,Right=2}, TextYAlignment = {Top = 1},
     AutomaticSize = {X = 1, Y = 2}, SortOrder = {LayoutOrder = 1},
     ZIndexBehavior = {Sibling = 1}, ScrollingDirection = {X = 1, Y = 2},
     FillDirection = {Horizontal = 1, Vertical = 2},
