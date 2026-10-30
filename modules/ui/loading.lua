@@ -51,13 +51,11 @@ return function(environment)
     if image:match("^%d+$")then image="rbxassetid://"..image end
     round(create("ImageLabel",{Name="PresentationImage",Image=image,BackgroundTransparency=1,
         Size=UDim2.fromScale(1,1),ScaleType=Enum.ScaleType.Crop,ZIndex=1},card),18)
-    round(create("Frame",{Size=UDim2.fromScale(1,1),BackgroundColor3=Color3.fromRGB(8,5,12),
-        BackgroundTransparency=.80,BorderSizePixel=0,ZIndex=2},card),18)
     local lowerShade=round(create("Frame",{Name="LowerShade",Size=UDim2.fromScale(1,1),
-        BackgroundColor3=Color3.fromRGB(10,6,14),BorderSizePixel=0,ZIndex=3},card),18)
+        BackgroundColor3=Color3.fromRGB(0,0,0),BorderSizePixel=0,ZIndex=3},card),18)
     create("UIGradient",{Rotation=90,Transparency=NumberSequence.new({
-        NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(.5,1),
-        NumberSequenceKeypoint.new(.72,.65),NumberSequenceKeypoint.new(1,.05)})},lowerShade)
+        NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(.65,1),
+        NumberSequenceKeypoint.new(.82,.82),NumberSequenceKeypoint.new(1,.35)})},lowerShade)
     local function label(name,text,size,position,height)
         return create("TextLabel",{Name=name,Text=text,Font=Enum.Font.GothamMedium,TextSize=size,
             TextColor3=Color3.fromRGB(255,240,246),BackgroundTransparency=1,Position=position,
