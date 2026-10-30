@@ -1,7 +1,7 @@
 return function(app)
     local ui, theme, package=app.UI,app.Theme,app.Flows.Movimientos
     local tabs={{"emotes","Emotes",84},{"animations","Animaciones",108},{"favorites","Favoritos",94},
-        {"recent","Recientes",92},{"friends","Amigos",82},{"keybinds","Atajos",76},{"settings","Ajustes",80}}
+        {"recent","Recientes",92},{"friends","Amigos",82},{"keybinds","Atajos",76}}
     local combo={}
     local function stop(c)
         c.isComboActive=false;c._comboLoopEnabled=false;c.ComboQueue={};c.StopEmote(false)
@@ -34,17 +34,6 @@ return function(app)
                         end,true)
                         ui:Action(content,scope,"Detener seguimiento",function()c.LocalEmoteFollow.Stop();status.Text=c.LocalEmoteFollow.GetStatus()end)
                         ui:Watch(scope,function()status.Text=c.LocalEmoteFollow.GetStatus()end)
-                        return
-                    end
-                    if id=="settings" then
-                        ui:Number(content,scope,"Velocidad del emote",c.Settings.speed,function(n)
-                            c.Settings.speed=math.clamp(n,0,10);c.ApplySpeedToAllTracks();c.SaveLocalData();return true,c.Settings.speed
-                        end)
-                        for _, setting in ipairs({{"loopEmote","Repetir emote"},{"stopOnWalk","Detener al caminar"},{"showHUD","Mostrar reproductor"},{"notifications","Notificaciones"}}) do
-                            ui:Toggle(content,scope,setting[2],function()return c.Settings[setting[1]]end,function(v)c.Settings[setting[1]]=v;c.SaveLocalData();return true end)
-                        end
-                        ui:Action(content,scope,"Restaurar animaciones originales",function()c.RemoveAnimationPacks();status.Text="Animaciones restauradas."end)
-                        ui:Action(content,scope,"Detener reproducción",function()stop(c);status.Text="Reproducción detenida."end)
                         return
                     end
                     if id=="keybinds" then

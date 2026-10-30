@@ -98,7 +98,16 @@ return function(app)
         if self.OnLayout then self.OnLayout(self.Compact) end
     end
     function controller:Center() window.Position = UDim2.fromScale(.5, .5) end
-    function controller:SetTitle(title, detail) heading.Text = title;subtitle.Text = detail or "" end
+    function controller:SetTitle(title, detail)
+        local hasTitle=title~=nil and title~=""
+        heading.Text=title or "";heading.Visible=hasTitle
+        subtitle.Text=detail or ""
+        subtitle.Position=UDim2.fromOffset(0,hasTitle and 30 or 0)
+        subtitle.TextSize=hasTitle and 12 or 14
+        subtitle.TextColor3=hasTitle and theme.Muted or theme.Text
+        local offset=hasTitle and 58 or 38
+        pages.Position=UDim2.fromOffset(0,offset);pages.Size=UDim2.new(1,0,1,-offset)
+    end
     function controller:ResetSize()
         self:Layout(app.Config.Width, app.Config.Height);self:Center()
         app.Storage.Values.Width = width;app.Storage.Values.Height = height;app.Storage:Save()

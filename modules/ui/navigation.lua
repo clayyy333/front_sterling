@@ -41,6 +41,8 @@ return function(app)
             if not feature.Available or feature.Available(app) then
                 local button = ui:Button(window.Nav, feature.Label or feature.Title)
                 button.Name = feature.Id;button.LayoutOrder = index
+                button.TextXAlignment=Enum.TextXAlignment.Left
+                ui:Create("UIPadding",{PaddingLeft=UDim.new(0,12),PaddingRight=UDim.new(0,8)},button)
                 self.Buttons[feature.Id] = button
                 app:Connect(button.Activated, function() self:Show(feature.Id) end)
             end

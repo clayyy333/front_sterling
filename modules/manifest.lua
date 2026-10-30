@@ -18,6 +18,6 @@ return {
         "player/spectator_camera", "player/flight_control", "player/movement_control",
     },
     adapters = {"adapters/flows", "adapters/vehicle2_auto", "adapters/movements", "player/continuous_jump"},
-    features = {"features/home", "features/movements", "features/volar", "features/ancla", "features/control", "features/interface", "ui/playback"},
+    features = {"features/home", "features/movements", "features/volar", "features/ancla", "features/control", "features/settings", "features/interface", "ui/playback"},
     start = "core/start",
 }
