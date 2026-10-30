@@ -45,7 +45,9 @@ NumberSequenceKeypoint={new=function(t,v)return {Time=t,Value=v}end}
 ColorSequence={new=function(v)return v end}
 ColorSequenceKeypoint={new=function(t,v)return {Time=t,Value=v}end}
 Color3 = {fromRGB = function(...) return {...} end}
+TweenInfo={new=function(...)return {...}end}
 Enum = {
+    EasingStyle={Linear=1},EasingDirection={InOut=1},
     KeyCode = {W=1,S=2,A=3,D=4,Space=5,LeftControl=6,C=7,LeftShift=8},
     Font = {Gotham = 1, GothamBold = 2, GothamMedium = 3, Garamond=4},
     ScaleType={Crop=1}, TextXAlignment = {Left = 1,Right=2}, TextYAlignment = {Top = 1},
@@ -120,8 +122,15 @@ local runService = {Heartbeat=signal(),RenderStepped=signal(),Stepped=signal(),P
 local renderBindings = {OriginalBinding=function()end,__WF_V3_RESTORE=function()end,__VR7_CONTACT_ADJUSTABLE_RESTORE=function()end}
 function runService:BindToRenderStep(name, _, callback) renderBindings[name] = callback end
 function runService:UnbindFromRenderStep(name) renderBindings[name] = nil end
+local tweens={}
+local tweenService={Create=function(_,object,info,goal)
+    local tween={Object=object,Info=info,Goal=goal}
+    function tween:Play()self.Playing=true end
+    function tween:Cancel()self.Playing=false;self.Cancelled=true end
+    tweens[#tweens+1]=tween;return tween
+end}
 local writes = 0
-local services = {
+local services = {TweenService=tweenService,
     Players = {LocalPlayer = player, PlayerRemoving=signal()}, UserInputService = input, RunService=runService,Workspace=workspace,
     HttpService = {JSONDecode = function(_, value)
         if value:find('"bundledItems"',1,true) then return {data={{id=2,name='Pack',bundledItems={}}}} end
@@ -145,9 +154,9 @@ readfile = function(path)
         assert(named.Brand.Position.Y.Offset+named.Brand.Size.Y.Offset<named.Subtitle.Position.Y.Offset,'title/subtitle do not overlap')
         assert(named.Subtitle.Position.Y.Offset+named.Subtitle.Size.Y.Offset<named.LoadingCard.Size.Y.Offset-48,'names clear the loading footer')
         assert(named.OuterRim:FindFirstChildOfClass('UIGradient') and named.BrandDepth,'rim and title have depth')
-        assert(not named.LoadingShadow and named.RedHalo1 and named.RedHalo20,'solid shadow bands replaced by feathered red halo')
-        assert(named.RedHalo1.BackgroundTransparency==1 and named.RedHalo20.BackgroundTransparency==1,'halo must never paint solid rectangles')
-        assert(named.RedHalo1:FindFirstChild('Feather').Transparency<named.RedHalo20:FindFirstChild('Feather').Transparency,'glow fades outward')
+        assert(not named.RedHalo20 and named.LightBloom1 and named.LightBloom2,'heavy fixed halo replaced by moving light blooms')
+        assert(named.OuterRim:FindFirstChild('TravelingLight'),'border light has animated gradient')
+        assert(#tweens>=3 and tweens[#tweens].Playing and tweens[#tweens].Goal.Rotation==360,'engine tween drives border movement')
     end
     assert(sources[relative], "not found: " .. path)
     return sources[relative]
@@ -256,4 +265,5 @@ assert(app.Window.Gui.Destroyed and environment.SterlingApp == nil)
 local count=0;for _ in pairs(renderBindings)do count=count+1 end
 assert(count==3 and renderBindings.OriginalBinding and renderBindings.__WF_V3_RESTORE and renderBindings.__VR7_CONTACT_ADJUSTABLE_RESTORE,'close removes only Sterling render bindings')
 for _, s in ipairs(signals) do assert(s:Count() == 0, "close/reload must disconnect every listener") end
+for _,tween in ipairs(tweens)do assert(tween.Cancelled,'loader tweens must stop on close')end
 print("Sterling interface OK: full local entry, lazy pages, touch resize, preference save, responsive layout, isolated reload and cleanup")

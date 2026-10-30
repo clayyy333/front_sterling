@@ -15,30 +15,43 @@ return function(environment)
         DisplayOrder=1000,ZIndexBehavior=Enum.ZIndexBehavior.Sibling},parent)
     local overlay=create("Frame",{Size=UDim2.fromScale(1,1),BorderSizePixel=0,
         BackgroundColor3=Color3.fromRGB(8,8,12),BackgroundTransparency=.25},gui)
-    -- Feathered outline: transparent centers, no stacked solid rectangles.
-    -- Small overlapping rings approximate a Gaussian red glow without textures.
+    local tweenService=game:GetService("TweenService")
+    local borderTweens={}
+    local borderColors=ColorSequence.new({
+        ColorSequenceKeypoint.new(0,Color3.fromRGB(54,14,29)),
+        ColorSequenceKeypoint.new(.25,Color3.fromRGB(109,21,49)),
+        ColorSequenceKeypoint.new(.43,Color3.fromRGB(240,47,92)),
+        ColorSequenceKeypoint.new(.5,Color3.fromRGB(255,214,231)),
+        ColorSequenceKeypoint.new(.57,Color3.fromRGB(240,47,92)),
+        ColorSequenceKeypoint.new(.75,Color3.fromRGB(109,21,49)),
+        ColorSequenceKeypoint.new(1,Color3.fromRGB(54,14,29))})
+    local function animateBorder(stroke,soft)
+        local properties={Name="TravelingLight",Rotation=0,Color=borderColors}
+        if soft then
+            properties.Transparency=NumberSequence.new({
+                NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(.32,1),
+                NumberSequenceKeypoint.new(.5,.12),NumberSequenceKeypoint.new(.68,1),
+                NumberSequenceKeypoint.new(1,1)})
+        end
+        local gradient=create("UIGradient",properties,stroke)
+        -- Same rotating-stroke technique as the original GUI, with engine-owned
+        -- repeats instead of a Lua loop. Three tweens, cancelled with this UI.
+        local tween=tweenService:Create(gradient,TweenInfo.new(6,Enum.EasingStyle.Linear,Enum.EasingDirection.InOut,-1),{Rotation=360})
+        borderTweens[#borderTweens+1]=tween;tween:Play()
+    end
     local halo={}
-    for index=20,1,-1 do
-        local distance=index*.8
-        local opacity=.42*math.exp(-((distance/6.5)^2))
-        local frame=round(create("Frame",{Name="RedHalo"..index,AnchorPoint=Vector2.new(.5,.5),
-            Position=UDim2.fromScale(.5,.5),BackgroundTransparency=1,BorderSizePixel=0,ZIndex=1},overlay),18+distance)
-        create("UIStroke",{Name="Feather",Color=Color3.fromRGB(222,27,64),
-            Thickness=2,Transparency=1-opacity},frame)
-        halo[#halo+1]={Frame=frame,Spread=distance*2}
+    for index,layer in ipairs({{4,3,.65},{8,6,.89}})do
+        local frame=round(create("Frame",{Name="LightBloom"..index,AnchorPoint=Vector2.new(.5,.5),
+            Position=UDim2.fromScale(.5,.5),BackgroundTransparency=1,BorderSizePixel=0,ZIndex=1},overlay),18+layer[1]/2)
+        local stroke=create("UIStroke",{Color=Color3.fromRGB(255,255,255),Thickness=layer[2],Transparency=layer[3]},frame)
+        animateBorder(stroke,true)
+        halo[#halo+1]={Frame=frame,Spread=layer[1]}
     end
     local card=round(create("Frame",{Name="LoadingCard",ZIndex=2,AnchorPoint=Vector2.new(.5,.5),
         Position=UDim2.fromScale(.5,.5),BorderSizePixel=0,ClipsDescendants=true,
         BackgroundColor3=Color3.fromRGB(20,16,23)},overlay),18)
-    local rim=create("UIStroke",{Name="OuterRim",Color=Color3.fromRGB(255,255,255),Thickness=1.3,Transparency=.18},card)
-    create("UIGradient",{Rotation=35,Color=ColorSequence.new({
-        ColorSequenceKeypoint.new(0,Color3.fromRGB(255,87,115)),
-        ColorSequenceKeypoint.new(.35,Color3.fromRGB(210,28,68)),
-        ColorSequenceKeypoint.new(.7,Color3.fromRGB(124,17,45)),
-        ColorSequenceKeypoint.new(1,Color3.fromRGB(235,51,90))})},rim)
-    local inner=round(create("Frame",{Name="InnerRim",BackgroundTransparency=1,BorderSizePixel=0,
-        Position=UDim2.fromOffset(2,2),Size=UDim2.new(1,-4,1,-4),ZIndex=7},card),16)
-    create("UIStroke",{Color=Color3.fromRGB(247,131,151),Thickness=1,Transparency=.78},inner)
+    local rim=create("UIStroke",{Name="OuterRim",Color=Color3.fromRGB(255,255,255),Thickness=2,Transparency=.08},card)
+    animateBorder(rim,false)
     local image=tostring((environment.SterlingSource or {}).IntroImage or "125472021271676")
     if image:match("^%d+$")then image="rbxassetid://"..image end
     round(create("ImageLabel",{Name="PresentationImage",Image=image,BackgroundTransparency=1,
@@ -131,6 +144,7 @@ return function(environment)
     function controller:Destroy()
         if self.Destroyed then return end
         self.Destroyed=true
+        for _,tween in ipairs(borderTweens)do tween:Cancel()end
         for _,connection in ipairs(connections)do connection:Disconnect()end
         if cameraConnection then cameraConnection:Disconnect();cameraConnection=nil end
         gui:Destroy()
