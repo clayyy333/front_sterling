@@ -76,9 +76,9 @@ return function(environment)
     local status=label("Stage","Cargando...",12,UDim2.new(0,22,1,-48),22)
     status.TextXAlignment=Enum.TextXAlignment.Left;status.Size=UDim2.new(1,-118,0,22)
     local track=round(create("Frame",{Name="ProgressTrack",Position=UDim2.new(0,22,1,-16),
-        Size=UDim2.new(1,-44,0,4),BackgroundColor3=Color3.fromRGB(9,9,12),
-        BackgroundTransparency=.06,BorderSizePixel=0,ClipsDescendants=true,ZIndex=4},card),3)
-    create("UIStroke",{Color=Color3.fromRGB(45,44,53),Thickness=1,Transparency=.65},track)
+        Size=UDim2.new(1,-44,0,4),BackgroundColor3=Color3.fromRGB(0,0,0),
+        BackgroundTransparency=0,BorderSizePixel=0,ClipsDescendants=true,ZIndex=4},card),3)
+    create("UIStroke",{Color=Color3.fromRGB(24,24,24),Thickness=1,Transparency=.35},track)
     local fill=round(create("Frame",{Name="Progress",Size=UDim2.fromScale(0,1),
         BackgroundColor3=Color3.fromRGB(225,65,99),BorderSizePixel=0,ZIndex=5},track),3)
     local percent=label("Percent","0%",11,UDim2.new(1,-84,1,-48),22)
