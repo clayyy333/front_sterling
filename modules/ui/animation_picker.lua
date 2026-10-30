@@ -12,16 +12,20 @@ return function(app)
         owner.Cleanups[#owner.Cleanups+1]=close
         local function open(title)
             close();scope=ui:Scope();scope.OnError=owner.OnError
-            modal=ui:Create("TextButton",{Name="AnimationPicker",Text="",Size=UDim2.fromScale(1,1),
-                BackgroundColor3=Color3.fromRGB(0,0,0),BackgroundTransparency=.35,BorderSizePixel=0,Active=true,ZIndex=100},app.Window.Gui)
+            -- Own full-screen layer: the main window keeps its safe-area layout.
+            modal=ui:Create("ScreenGui",{Name="AnimationPickerLayer",ResetOnSpawn=false,IgnoreGuiInset=true,
+                DisplayOrder=app.Window.Gui.DisplayOrder+1,ZIndexBehavior=Enum.ZIndexBehavior.Sibling},app.PlayerGui)
+            local backdrop=ui:Create("TextButton",{Name="AnimationPicker",Text="",Size=UDim2.fromScale(1,1),
+                Position=UDim2.fromOffset(0,0),AutoButtonColor=false,
+                BackgroundColor3=Color3.fromRGB(0,0,0),BackgroundTransparency=.35,BorderSizePixel=0,Active=true,ZIndex=100},modal)
             local panel=ui:Round(ui:Create("Frame",{Name="PickerPanel",Size=UDim2.new(.9,0,.9,0),
                 AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),BackgroundColor3=theme.Surface,
-                BorderSizePixel=0,Active=true,ZIndex=101},modal),14)
+                BorderSizePixel=0,Active=true,ZIndex=101},backdrop),14)
             ui:Create("UISizeConstraint",{MaxSize=Vector2.new(420,460)},panel)
             local heading=ui:Label(panel,title,16);heading.Font=Enum.Font.GothamBold
             heading.Size=UDim2.new(1,-66,0,40);heading.Position=UDim2.fromOffset(16,7)
             local exit=ui:Button(panel,"×");exit.Position=UDim2.new(1,-42,0,9);exit.Size=UDim2.fromOffset(32,32)
-            scope:Connect(exit.Activated,close);scope:Connect(modal.Activated,close)
+            scope:Connect(exit.Activated,close);scope:Connect(backdrop.Activated,close)
             local list=ui:Create("ScrollingFrame",{Size=UDim2.new(1,-28,1,-64),Position=UDim2.fromOffset(14,54),
                 BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=3,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},panel)
             ui:Create("UIListLayout",{Padding=UDim.new(0,8)},list)
