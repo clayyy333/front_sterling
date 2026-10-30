@@ -20,12 +20,22 @@ return function(app)
         local c=context();if not c then return end
         c.isComboActive=false;c._comboLoopEnabled=false;c.ComboQueue={};c.StopEmote(false)
     end)
+    local speedButtons={}
+    local function updateSpeedButtons()
+        local c=context();local current=c and tonumber(c.Settings.speed)
+        for speed,button in pairs(speedButtons)do
+            local selected=current and math.abs(current-speed)<.0001
+            app.Appearance:BindColor(button,"BackgroundColor3",selected and "Accent"or"Raised")
+            app.Appearance:BindColor(button,"TextColor3",selected and "AccentText"or"Text")
+        end
+    end
     for index,speed in ipairs({.1,.5,1,1.5,2})do
         local button=ui:Button(dock,tostring(speed).."×")
+        button.Name="PlaybackSpeed_"..tostring(speed);speedButtons[speed]=button
         button.Position=UDim2.new((index-1)*.16,12,0,42);button.Size=UDim2.new(.15,-7,0,26);button.TextSize=11
         scope:Connect(button.Activated,function()
             local c=context();if not c then return end
-            c.Settings.speed=speed;c.ApplySpeedToAllTracks();c.SaveLocalData();paused=false;pause.Text="Ⅱ"
+            c.Settings.speed=speed;c.ApplySpeedToAllTracks();c.SaveLocalData();paused=false;pause.Text="Ⅱ";updateSpeedButtons()
         end)
     end
     local copy=ui:Button(dock,"ID");copy.Position=UDim2.new(.8,8,0,42);copy.Size=UDim2.new(.2,-20,0,26);copy.TextSize=11
@@ -35,6 +45,7 @@ return function(app)
         if clipboard and item then clipboard(tostring(item.id));copy.Text="✓"end
     end)
     ui:Watch(scope,function()
+        updateSpeedButtons()
         local c=context();local track=c and c.currentAnimTrack
         dock.Visible=track~=nil and track.IsPlaying and c.Settings.showHUD~=false
         if track~=last then last=track;paused=false;pause.Text="Ⅱ";copy.Text="ID"end

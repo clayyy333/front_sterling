@@ -322,6 +322,16 @@ assert(app.Navigation.Buttons.movimientos.TextColor3==app.Theme.AccentText,'sele
 fake.Settings.speed=1;fake.Settings.loopEmote=true;fake.Settings.stopOnWalk=true
 fake.ApplySpeedToAllTracks=function()fake.SpeedApplied=true end
 fake.SaveLocalData=function()fake.PreferencesSaved=true end
+local playbackContext=movement.Context
+movement.Context={Settings={speed=1},_genv=function()return {}end,
+    ApplySpeedToAllTracks=function()end,SaveLocalData=function()end}
+runService.Heartbeat:Fire(.21)
+local normalSpeed=find(app.Window.Gui,'PlaybackSpeed_1')
+local halfSpeed=find(app.Window.Gui,'PlaybackSpeed_0.5')
+assert(normalSpeed.BackgroundColor3==app.Theme.Accent,'current playback speed uses theme highlight')
+halfSpeed.Activated:Fire()
+assert(halfSpeed.BackgroundColor3==app.Theme.Accent and normalSpeed.BackgroundColor3==app.Theme.Raised,'changing speed immediately moves highlight')
+movement.Context=playbackContext
 local normalEngine=app.Flows.Ancla.Normal
 local normalMock={}
 function normalMock:SetAncla(v)self.AnclaEnabled=v;return true end
@@ -331,8 +341,10 @@ app.Flows.Ancla.Normal=normalMock
 app.Navigation:Show('ancla')
 local normalToggle=textButton(app.Navigation.Pages.ancla,'Activar Ancla')
 normalToggle.Activated:Fire()
+assert(normalToggle.Text:find('Encendido',1,true),'toggle shows Spanish active state')
 assert(normalMock.AnclaEnabled and normalMock.AntiSeatEnabled and normalMock.HeartbeatEnabled,'one anchor toggle enables all three controls')
 normalToggle.Activated:Fire()
+assert(normalToggle.Text:find('Apagado',1,true),'toggle shows Spanish inactive state')
 assert(not normalMock.AnclaEnabled and not normalMock.AntiSeatEnabled and not normalMock.HeartbeatEnabled,'one anchor toggle disables all three controls')
 app.Flows.Ancla.Normal=normalEngine
 assert(app.Features.Ordered[#app.Features.Ordered].Id=='settings','settings is the final navigation section')

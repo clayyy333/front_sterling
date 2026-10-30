@@ -72,7 +72,7 @@ return function(app)
         local function refresh()
             if not button or scope.Destroyed then return end
             local active=get()==true
-            button.Text=text..(active and "  ·  ON" or "  ·  OFF")
+            button.Text=text..(active and "  ·  Encendido" or "  ·  Apagado")
             button.BackgroundColor3=active and theme.Selected or theme.Raised
             button.TextColor3=active and theme.AccentText or theme.Text
         end
