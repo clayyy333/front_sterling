@@ -29,8 +29,8 @@ return function(environment)
         NumberSequenceKeypoint.new(1,1)})
     for index,name in ipairs({"TopWash","BottomWash"})do
         local y=index==1 and 0 or 1
-        local start=index==1 and .16 or .84
-        local finish=index==1 and .84 or .16
+        local start=index==1 and .22 or .78
+        local finish=index==1 and .78 or .22
         local wash=create("Frame",{Name=name,Size=UDim2.new(.68,0,0,32),AnchorPoint=Vector2.new(.5,.5),
             Position=UDim2.fromScale(start,y),BackgroundTransparency=1,BorderSizePixel=0},lights)
         for row=0,31 do
@@ -40,7 +40,7 @@ return function(environment)
                 BackgroundColor3=Color3.fromRGB(210,24,59),BackgroundTransparency=1-opacity,BorderSizePixel=0},wash)
             create("UIGradient",{Transparency=horizontalFade},strip)
         end
-        local tween=tweenService:Create(wash,TweenInfo.new(2,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,true),
+        local tween=tweenService:Create(wash,TweenInfo.new(2.6,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,true),
             {Position=UDim2.fromScale(finish,y)})
         borderTweens[#borderTweens+1]=tween;tween:Play()
     end

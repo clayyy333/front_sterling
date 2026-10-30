@@ -10,7 +10,7 @@ return function(app)
         BackgroundColor3 = theme.Surface, BorderSizePixel = 0, ClipsDescendants = true,
     }, gui), 16)
     window.ZIndex=2
-    local edgeLights=ui:EdgeLights(gui,window,2)
+    local edgeLights=ui:EdgeLights(gui,window,2.6)
     local bodySurface=ui:Round(ui:Create("Frame",{Name="BodySurface",BackgroundColor3=theme.Background,
         BorderSizePixel=0},window),16)
     local header = ui:Create("Frame", {

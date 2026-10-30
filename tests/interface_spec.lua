@@ -257,7 +257,7 @@ assert(lights and not find(app.Window.Gui,'WindowShadow'),'main window uses soft
 assert(find(app.Window.Gui,'Header').BackgroundTransparency==1 and find(app.Window.Gui,'Sidebar').BackgroundTransparency==1,'header/sidebar cannot square off outer corners')
 assert(find(app.Window.Gui,'BodySurface'):FindFirstChildOfClass('UICorner'),'content surface respects rounded lower corners')
 app.Window.Gui:GetPropertyChangedSignal('Enabled'):Fire()
-assert(lights.Visible and tweens[#tweens].Playing and tweens[#tweens].Info[1]==2,'main light motion is enabled at two seconds')
+assert(lights.Visible and tweens[#tweens].Playing and tweens[#tweens].Info[1]==2.6,'main light motion uses the adjusted duration')
 app.Window.Frame.Visible=false;app.Window.Frame:GetPropertyChangedSignal('Visible'):Fire()
 assert(not lights.Visible and tweens[#tweens].Paused,'minimize pauses light animations')
 app.Window.Frame.Visible=true;app.Window.Frame:GetPropertyChangedSignal('Visible'):Fire()
