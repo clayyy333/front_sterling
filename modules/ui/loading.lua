@@ -47,7 +47,6 @@ return function(environment)
     local card=round(create("Frame",{Name="LoadingCard",ZIndex=2,AnchorPoint=Vector2.new(.5,.5),
         Position=UDim2.fromScale(.5,.5),BorderSizePixel=0,ClipsDescendants=true,
         BackgroundColor3=Color3.fromRGB(20,16,23)},overlay),18)
-    create("UIStroke",{Name="OuterRim",Color=Color3.fromRGB(100,39,57),Thickness=1,Transparency=.6},card)
     local image=tostring((environment.SterlingSource or {}).IntroImage or "125472021271676")
     if image:match("^%d+$")then image="rbxassetid://"..image end
     round(create("ImageLabel",{Name="PresentationImage",Image=image,BackgroundTransparency=1,
