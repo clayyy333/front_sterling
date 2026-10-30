@@ -29,8 +29,8 @@ return function(environment)
         NumberSequenceKeypoint.new(1,1)})
     for index,name in ipairs({"TopWash","BottomWash"})do
         local y=index==1 and 0 or 1
-        local start=index==1 and .36 or .64
-        local finish=index==1 and .64 or .36
+        local start=index==1 and .16 or .84
+        local finish=index==1 and .84 or .16
         local wash=create("Frame",{Name=name,Size=UDim2.new(.68,0,0,32),AnchorPoint=Vector2.new(.5,.5),
             Position=UDim2.fromScale(start,y),BackgroundTransparency=1,BorderSizePixel=0},lights)
         for row=0,31 do

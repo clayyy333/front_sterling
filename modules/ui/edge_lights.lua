@@ -10,15 +10,15 @@ return function(app)
         local tweens={}
         for index,name in ipairs({"TopWash","BottomWash"})do
             local y=index==1 and 0 or 1
-            local start=index==1 and .36 or .64
-            local finish=index==1 and .64 or .36
+            local start=index==1 and .16 or .84
+            local finish=index==1 and .84 or .16
             local wash=ui:Create("Frame",{Name=name,BackgroundTransparency=1,BorderSizePixel=0,
-                Size=UDim2.new(.68,0,0,32),AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(start,y)},root)
-            for row=0,31 do
-                local distance=row+.5-16
+                Size=UDim2.new(.84,0,0,48),AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(start,y)},root)
+            for row=0,47 do
+                local distance=row+.5-24
                 local strip=ui:Create("Frame",{Name="SoftRed",BorderSizePixel=0,Size=UDim2.new(1,0,0,1),
                     Position=UDim2.fromOffset(0,row),BackgroundColor3=Color3.fromRGB(210,24,59),
-                    BackgroundTransparency=1-.34*math.exp(-((distance/6.5)^2))},wash)
+                    BackgroundTransparency=1-.48*math.exp(-((distance/10)^2))},wash)
                 ui:Create("UIGradient",{Transparency=fade},strip)
             end
             tweens[index]=game:GetService("TweenService"):Create(wash,
