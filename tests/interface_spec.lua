@@ -234,8 +234,8 @@ textButton(panel,'Activar vuelo').Activated:Fire()
 assert(flight.Flying,'flight button calls the registered controller')
 textButton(panel,'Activar vuelo').Activated:Fire();assert(not flight.Flying)
 flight.Start,flight.Stop=baseStart,baseStop
-textButton(panel,'Salto continuo').Activated:Fire()
-textButton(panel,'Salto continuo  ').Activated:Fire()
+textButton(panel,'Salto infinito').Activated:Fire()
+textButton(panel,'Salto infinito  ').Activated:Fire()
 assert(app.Flows.Control.SaltoContinuo.Enabled,'continuous jump toggle connected')
 app.Flows.Control.SaltoContinuo:SetEnabled(false)
 local movement=app.Flows.Movimientos
@@ -264,6 +264,7 @@ movement.EnsureLoaded=function()return true,fake end
 app.Navigation:Reload('movimientos')
 local catalog=app.Navigation.Pages.movimientos
 assert(find(catalog,'CatalogGrid'),'real catalog replaces informational cards')
+assert(find(catalog,'CatalogGrid').Position.X.Offset==2,'catalog borders are inset from the clipping edge')
 find(catalog,'Play').Activated:Fire();assert(played==11,'thumbnail starts selected emote')
 textButton(catalog,'☆').Activated:Fire();assert(favorites[11],'favorite control wired')
 local search=find(catalog,'CatalogSearch');search.Text='Baile';search:GetPropertyChangedSignal('Text'):Fire()
@@ -308,6 +309,20 @@ assert(app.Navigation.Buttons.movimientos.TextColor3==app.Theme.AccentText,'sele
 fake.Settings.speed=1;fake.Settings.loopEmote=true;fake.Settings.stopOnWalk=true
 fake.ApplySpeedToAllTracks=function()fake.SpeedApplied=true end
 fake.SaveLocalData=function()fake.PreferencesSaved=true end
+local normalEngine=app.Flows.Ancla.Normal
+local normalMock={}
+function normalMock:SetAncla(v)self.AnclaEnabled=v;return true end
+function normalMock:SetAntiSeat(v)self.AntiSeatEnabled=v;return true end
+function normalMock:SetHeartbeat(v)self.HeartbeatEnabled=v;return true end
+app.Flows.Ancla.Normal=normalMock
+app.Navigation:Show('ancla')
+local normalToggle=textButton(app.Navigation.Pages.ancla,'Activar Ancla')
+normalToggle.Activated:Fire()
+assert(normalMock.AnclaEnabled and normalMock.AntiSeatEnabled and normalMock.HeartbeatEnabled,'one anchor toggle enables all three controls')
+normalToggle.Activated:Fire()
+assert(not normalMock.AnclaEnabled and not normalMock.AntiSeatEnabled and not normalMock.HeartbeatEnabled,'one anchor toggle disables all three controls')
+app.Flows.Ancla.Normal=normalEngine
+assert(app.Features.Ordered[#app.Features.Ordered].Id=='settings','settings is the final navigation section')
 app.Navigation:Show('settings')
 local preferences=app.Navigation.Pages.settings
 assert(textButton(preferences,'Mostrar barra de reproducción'),'requested playback setting is present')

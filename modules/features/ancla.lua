@@ -13,13 +13,20 @@ return function(app)
                     end
                 end
                 if id=="normal" then
-                    ui:Note(stack,"Tres controles independientes para el ancla normal.")
-                    for _,spec in ipairs({{"Ancla","AnclaEnabled","SetAncla"},{"AntiSeat","AntiSeatEnabled","SetAntiSeat"},{"Heartbeat","HeartbeatEnabled","SetHeartbeat"}})do
-                        ui:Toggle(stack,scope,spec[1],function()return flows.Normal[spec[2]]end,function(v)
-                            if v then isolate("normal")end
-                            return flows.Normal[spec[3]](flows.Normal,v)
-                        end)
-                    end
+                    ui:Note(stack,"Ancla normal con AntiSeat y Heartbeat integrados.")
+                    ui:Toggle(stack,scope,"Activar Ancla",function()
+                        return flows.Normal.AnclaEnabled and flows.Normal.AntiSeatEnabled and flows.Normal.HeartbeatEnabled
+                    end,function(v)
+                        if v then
+                            isolate("normal")
+                            local ok,err=flows.Normal:SetAncla(true)
+                            if ok==false then return false,err end
+                            flows.Normal:SetAntiSeat(true);flows.Normal:SetHeartbeat(true)
+                        else
+                            flows.Normal:SetHeartbeat(false);flows.Normal:SetAntiSeat(false);flows.Normal:SetAncla(false)
+                        end
+                        return true
+                    end)
                     ui:Action(stack,scope,"Forzar regreso",function()
                         local ok,err=flows.Regreso:Force();status.Text=err or (ok and "Regresando…" or "No hay checkpoint.")
                     end)
@@ -37,12 +44,7 @@ return function(app)
                     ui:Action(stack,scope,"Actualizar referencia segura",function()
                         flows.MueveteV13:ResetFallProtectionReference();status.Text="Referencia actualizada."
                     end)
-                    if app.Legacy.ExperimentalFlingCore:IsAuthorized()then
-                        ui:Action(stack,scope,"Copiar diagnóstico",function()
-                            local copy=app.Environment.setclipboard or setclipboard
-                            if copy then copy(flows.MueveteV13:GetDiagnosticReport());status.Text="Diagnóstico copiado."else status.Text="El ejecutor no permite copiar."end
-                        end)
-                    end
+
                 end
                 ui:Watch(scope,function()
                     local active=id=="normal" and flows.Normal.AnclaEnabled or id=="test" and flows.Test.Running or id=="mobile" and flows.MueveteV13.Running

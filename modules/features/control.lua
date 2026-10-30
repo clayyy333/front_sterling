@@ -2,7 +2,7 @@ return function(app)
     local ui,flows=app.UI,app.Flows.Control
     app.Features:Register({Id="control",Label="Control",Title="Control",Subtitle="Cámara, vuelo y movimiento.",
         Mount=function(_,parent)
-            ui:Workspace(parent,{{"camera","Cámara",86},{"flight","Vuelo",76},{"speed","Velocidad",92},{"jump","Salto continuo",122}},function(id,body,scope)
+            ui:Workspace(parent,{{"camera","Cámara",86},{"flight","Vuelo",76},{"speed","Velocidad",92},{"jump","Salto infinito",122}},function(id,body,scope)
                 local stack=ui:Stack(body);local status=ui:Status(stack,scope)
                 if id=="camera"then
                     local c=flows.PerspectivaCamara
@@ -45,7 +45,7 @@ return function(app)
                 else
                     local c=flows.SaltoContinuo
                     ui:Note(stack,"Mantén pulsado el salto para elevarte. Al soltar, vuelves a caer.")
-                    ui:Toggle(stack,scope,"Salto continuo",function()return c.Enabled end,function(v)return c:SetEnabled(v)end)
+                    ui:Toggle(stack,scope,"Salto infinito",function()return c.Enabled end,function(v)return c:SetEnabled(v)end)
                     ui:Range(stack,scope,"Velocidad de ascenso",c.Speed,10,500,function(n)return true,c:SetSpeed(n)end)
                     local hold=ui:Button(stack,"Mantener para subir",true);hold.Size=UDim2.new(1,-2,0,40)
                     local pointer
