@@ -59,7 +59,21 @@ return function(app)
                     body.CanvasPosition=Vector2.new(0,0)
                     content=ui:Create("Frame",{Name="CatalogLayout",Size=UDim2.fromScale(1,1),BackgroundTransparency=1},body)
                     status=ui:Status(content,scope)
-                    status.Position=UDim2.new(0,0,1,-20);status.Size=UDim2.new(1,-4,0,20);status.TextSize=11
+                    status.Position=UDim2.new(0,0,1,id=="animations"and -24 or -62)
+                    status.Size=UDim2.new(1,-4,0,20);status.TextSize=11
+                    status.Text="";status.Visible=false;status.ZIndex=10
+                    status.BackgroundColor3=theme.Surface;status.BackgroundTransparency=.08
+                    ui:Round(status,6)
+                    local messageVersion=0
+                    scope:Connect(status:GetPropertyChangedSignal("Text"),function()
+                        messageVersion=messageVersion+1;local token=messageVersion
+                        status.Visible=status.Text~=""
+                        if status.Visible then
+                            task.delay(3,function()
+                                if not scope.Destroyed and token==messageVersion then status.Text=""end
+                            end)
+                        end
+                    end)
                     local tools=ui:Create("Frame",{Size=UDim2.new(1,-4,0,32),BackgroundTransparency=1},content)
                     local search=ui:Round(ui:Create("TextBox",{Name="CatalogSearch",Active=true,Selectable=true,Size=UDim2.new(1,-142,1,0),Text="",PlaceholderText="Buscar por nombre o ID…",ClearTextOnFocus=false,
                         Font=Enum.Font.Gotham,TextSize=12,TextColor3=theme.Text,BackgroundColor3=theme.Raised,BorderSizePixel=0},tools),8)
@@ -76,7 +90,7 @@ return function(app)
                         saved.Position=UDim2.fromScale(.68,0);saved.Size=UDim2.new(.32,0,1,0);saved.TextSize=11
                     end
                     local gridTop=id=="animations"and 80 or 42
-                    local footer=id=="animations"and 26 or 66
+                    local footer=id=="animations"and 6 or 42
                     local viewport=ui:Create("ScrollingFrame",{Name="CatalogViewport",Position=UDim2.fromOffset(0,gridTop),
                         Size=UDim2.new(1,0,1,-gridTop-footer),BackgroundTransparency=1,BorderSizePixel=0,
                         ScrollBarThickness=3,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},content)
@@ -96,7 +110,7 @@ return function(app)
                         local rows=math.clamp(math.floor((available+8)/rowHeight),1,3)
                         local perPage=columns*rows
                         maxPages=math.max(1,math.ceil(#items/perPage));page=math.clamp(page,1,maxPages)
-                        pageText.Text=page.." / "..maxPages;status.Text=#items.." resultados"
+                        pageText.Text=page.." / "..maxPages
                         previous.TextColor3=page>1 and theme.Text or theme.Muted
                         next.TextColor3=page<maxPages and theme.Text or theme.Muted
                         layout.CellSize=UDim2.new(1/columns,-8,0,cardHeight)
@@ -158,7 +172,7 @@ return function(app)
                     scope:Connect(next.Activated,function()if page<maxPages then page=page+1;draw()end end)
                     scope:Connect(viewport:GetPropertyChangedSignal("AbsoluteSize"),draw)
                     if id~="animations"then
-                        local footer=ui:Create("Frame",{Position=UDim2.new(0,0,1,-56),Size=UDim2.new(1,-4,0,30),BackgroundTransparency=1},content)
+                        local footer=ui:Create("Frame",{Position=UDim2.new(0,0,1,-36),Size=UDim2.new(1,-4,0,30),BackgroundTransparency=1},content)
                         if id=="emotes"then
                             local run=ui:Action(footer,scope,"Reproducir combo",function()
                                 if #combo==0 then status.Text="Añade hasta 3 emotes con + combo.";return end
