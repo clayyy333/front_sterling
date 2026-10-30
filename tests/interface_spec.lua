@@ -47,7 +47,7 @@ ColorSequenceKeypoint={new=function(t,v)return {Time=t,Value=v}end}
 Color3 = {fromRGB = function(...) return {...} end}
 TweenInfo={new=function(...)return {...}end}
 Enum = {
-    EasingStyle={Linear=1},EasingDirection={InOut=1},
+    EasingStyle={Linear=1,Sine=2},EasingDirection={InOut=1},
     KeyCode = {W=1,S=2,A=3,D=4,Space=5,LeftControl=6,C=7,LeftShift=8},
     Font = {Gotham = 1, GothamBold = 2, GothamMedium = 3, Garamond=4},
     ScaleType={Crop=1}, TextXAlignment = {Left = 1,Right=2}, TextYAlignment = {Top = 1},
@@ -153,10 +153,12 @@ readfile = function(path)
         assert(named.Brand.Position.Y.Offset>named.LoadingCard.Size.Y.Offset*(named.LoadingCard.Size.X.Offset>500 and .6 or .45),'title sits below the portrait')
         assert(named.Brand.Position.Y.Offset+named.Brand.Size.Y.Offset<named.Subtitle.Position.Y.Offset,'title/subtitle do not overlap')
         assert(named.Subtitle.Position.Y.Offset+named.Subtitle.Size.Y.Offset<named.LoadingCard.Size.Y.Offset-48,'names clear the loading footer')
-        assert(named.OuterRim:FindFirstChildOfClass('UIGradient') and named.BrandDepth,'rim and title have depth')
-        assert(not named.RedHalo20 and named.LightBloom1 and named.LightBloom2,'heavy fixed halo replaced by moving light blooms')
-        assert(named.OuterRim:FindFirstChild('TravelingLight'),'border light has animated gradient')
-        assert(#tweens>=3 and tweens[#tweens].Playing and tweens[#tweens].Goal.Rotation==360,'engine tween drives border movement')
+        assert(not named.OuterRim:FindFirstChildOfClass('UIGradient') and named.BrandDepth,'outline remains matte; only top/bottom lights animate')
+        assert(not named.LightBloom1 and named.TopWash and named.BottomWash,'rotating outline replaced by horizontal light washes')
+        assert(named.TopWash.Position.Y.Scale==0 and named.BottomWash.Position.Y.Scale==1,'lights stay at top and bottom')
+        assert(named.TopWash.BackgroundTransparency==1,'wash holder does not draw a rectangle')
+        assert(#named.TopWash:GetChildren()==32,'contiguous feathering rows have no gaps or strokes')
+        assert(tweens[#tweens].Playing and tweens[#tweens].Goal.Position and not tweens[#tweens].Goal.Rotation,'only horizontal motion')
     end
     assert(sources[relative], "not found: " .. path)
     return sources[relative]
