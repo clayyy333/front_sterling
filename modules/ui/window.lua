@@ -34,7 +34,7 @@ return function(app)
     app:Connect(window:GetPropertyChangedSignal("Size"),updateShadows)
     app:Connect(window:GetPropertyChangedSignal("Visible"),updateShadows)
     local header = ui:Create("Frame", {
-        Name = "Header", Size = UDim2.new(1, 0, 0, 54), BackgroundColor3 = theme.Surface,
+        Name = "Header", Size = UDim2.new(1, 0, 0, 48), BackgroundColor3 = theme.Surface,
         BorderSizePixel = 0, Active = true,
     }, window)
     local monogram = ui:Button(header, "S", true)
@@ -53,12 +53,12 @@ return function(app)
     }, sidebar)
     local navLayout = ui:Create("UIListLayout", {Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder}, navigation)
     local body = ui:Create("Frame", {Name = "Content", BackgroundTransparency = 1}, window)
-    local heading = ui:Label(body, "", 24)
+    local heading = ui:Label(body, "", 20)
     heading.Font = Enum.Font.GothamBold;heading.Size = UDim2.new(1, 0, 0, 34)
-    local subtitle = ui:Label(body, "", 13)
-    subtitle.Position = UDim2.fromOffset(0, 38);subtitle.Size = UDim2.new(1, 0, 0, 22);subtitle.TextColor3 = theme.Muted
+    local subtitle = ui:Label(body, "", 12)
+    subtitle.Position = UDim2.fromOffset(0, 30);subtitle.Size = UDim2.new(1, 0, 0, 22);subtitle.TextColor3 = theme.Muted
     local pages = ui:Create("Frame", {
-        Name = "Pages", Position = UDim2.fromOffset(0, 78), Size = UDim2.new(1, 0, 1, -78), BackgroundTransparency = 1,
+        Name = "Pages", Position = UDim2.fromOffset(0, 58), Size = UDim2.new(1, 0, 1, -58), BackgroundTransparency = 1,
     }, body)
     local grip = ui:Create("TextButton", {
         Name = "Resize", Text = "◢", TextSize = 16, TextColor3 = theme.Muted,
@@ -81,19 +81,19 @@ return function(app)
         window.Size = UDim2.fromOffset(width, height)
         self.Compact = width < 620
         if self.Compact then
-            sidebar.Position = UDim2.fromOffset(0, 54);sidebar.Size = UDim2.new(1, 0, 0, 52)
+            sidebar.Position = UDim2.fromOffset(0, 48);sidebar.Size = UDim2.new(1, 0, 0, 52)
             navigation.Position = UDim2.fromOffset(12, 6);navigation.Size = UDim2.new(1, -24, 1, -12)
             navigation.AutomaticCanvasSize = Enum.AutomaticSize.X;navigation.ScrollingDirection = Enum.ScrollingDirection.X
             navLayout.FillDirection = Enum.FillDirection.Horizontal
-            body.Position = UDim2.fromOffset(16, 122);body.Size = UDim2.new(1, -32, 1, -144)
-            heading.TextSize = 20
+            body.Position = UDim2.fromOffset(14, 106);body.Size = UDim2.new(1, -28, 1, -126)
+            heading.TextSize = 19
         else
-            sidebar.Position = UDim2.fromOffset(0, 54);sidebar.Size = UDim2.new(0, 174, 1, -54)
+            sidebar.Position = UDim2.fromOffset(0, 48);sidebar.Size = UDim2.new(0, 152, 1, -48)
             navigation.Position = UDim2.fromOffset(12, 20);navigation.Size = UDim2.new(1, -24, 1, -40)
             navigation.AutomaticCanvasSize = Enum.AutomaticSize.Y;navigation.ScrollingDirection = Enum.ScrollingDirection.Y
             navLayout.FillDirection = Enum.FillDirection.Vertical
-            body.Position = UDim2.fromOffset(198, 78);body.Size = UDim2.new(1, -222, 1, -102)
-            heading.TextSize = 24
+            body.Position = UDim2.fromOffset(174, 64);body.Size = UDim2.new(1, -194, 1, -84)
+            heading.TextSize = 19
         end
         if self.OnLayout then self.OnLayout(self.Compact) end
     end

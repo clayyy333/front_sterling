@@ -26,9 +26,14 @@ return function(app)
         window:SetTitle(feature.Title, feature.Subtitle)
         return true
     end
+    function navigation:Reload(id)
+        local page=self.Pages[id]
+        if page then page:Destroy();self.Pages[id]=nil end
+        return self:Show(id)
+    end
     function navigation:Layout(compact)
         for _, button in pairs(self.Buttons) do
-            button.Size = compact and UDim2.fromOffset(124, 40) or UDim2.new(1, -2, 0, 42)
+            button.Size = compact and UDim2.fromOffset(108, 34) or UDim2.new(1, -2, 0, 36)
         end
     end
     function navigation:Build()

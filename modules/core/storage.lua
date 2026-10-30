@@ -9,6 +9,10 @@ return function(app)
             storage.Values = result.preferences
         end
     end
+    if storage.Values.LayoutRevision ~= 2 then
+        storage.Values.Width,storage.Values.Height=app.Config.Width,app.Config.Height
+        storage.Values.LayoutRevision=2
+    end
     local function validSize(value)
         return type(value) == "number" and value == value and value >= 280 and value <= 4096
     end

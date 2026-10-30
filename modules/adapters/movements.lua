@@ -84,7 +84,7 @@ return function(app)
                 local key = input.KeyCode and input.KeyCode.Name
                 if not key then return end
                 for id, entry in pairs(context.KeybindsSet) do
-                    if entry.key == key then context.PlayEmote(id, entry.name);break end
+                    if type(entry)=="table" and tostring(entry.key):lower()==key:lower() then context.PlayEmote(id, entry.name);break end
                 end
             end)
             app:OnCleanup(function() keyConnection:Disconnect() end)

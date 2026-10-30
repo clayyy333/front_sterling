@@ -7,7 +7,7 @@ return {
     },
     core = {
         "core/lifecycle", "core/config", "core/services", "core/storage",
-        "ui/theme", "ui/components", "core/features", "core/legacy_context", "ui/window", "ui/navigation",
+        "ui/theme", "ui/components", "ui/controls", "core/features", "core/legacy_context", "ui/window", "ui/navigation",
     },
     legacy = {
         "player/anchor", "player/anchor_force_return", "player/static_noclip_anchor",
@@ -17,7 +17,7 @@ return {
         "player/xeno_fling_replication_assist",
         "player/spectator_camera", "player/flight_control", "player/movement_control",
     },
-    adapters = {"adapters/flows", "adapters/vehicle2_auto", "adapters/movements"},
-    features = {"features/home", "features/movements", "features/volar", "features/ancla", "features/control", "features/interface"},
+    adapters = {"adapters/flows", "adapters/vehicle2_auto", "adapters/movements", "player/continuous_jump"},
+    features = {"features/home", "features/movements", "features/volar", "features/ancla", "features/control", "features/interface", "ui/playback"},
     start = "core/start",
 }

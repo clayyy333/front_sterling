@@ -8,7 +8,7 @@ local vector3 = {};vector3.__index = function(a, key)
 end
 Vector3 = {new = function(x, y, z) return setmetatable({X=x,Y=y,Z=z}, vector3) end}
 Vector3.zero = Vector3.new(0, 0, 0)
-task = {spawn = function(callback) callback() end, defer = function(callback) callback() end}
+task = {spawn = function(callback) callback() end, defer = function(callback) callback() end, delay=function(_,callback)callback()end, wait=function()return 0 end}
 local signals = {}
 local function signal()
     local callbacks = {}
@@ -63,7 +63,7 @@ function object.__index(self, key)
         return v(size.X.Scale * parent.X + size.X.Offset, size.Y.Scale * parent.Y + size.Y.Offset)
     end
     if key == "AbsolutePosition" then return v(0, 0) end
-    if key == "Activated" or key == "InputBegan" or key == "DescendantAdded" then
+    if key == "Activated" or key == "InputBegan" or key == "DescendantAdded" or key=="Destroying" or key=="FocusLost" then
         if not self._signals[key] then self._signals[key] = signal() end
         return self._signals[key]
     end
@@ -77,6 +77,13 @@ function object:GetPropertyChangedSignal(name)
     if not self._signals[name] then self._signals[name] = signal() end
     return self._signals[name]
 end
+function object:GetDescendants()
+    local result={}
+    local function visit(root)
+        for _, child in ipairs(root:GetChildren())do result[#result+1]=child;visit(child)end
+    end
+    visit(self);return result
+end
 function object:GetChildren()
     local result = {}
     for _, child in ipairs(self._children) do if child.Parent == self then result[#result + 1] = child end end
@@ -88,7 +95,11 @@ end
 function object:FindFirstChildOfClass(class)
     for _, child in ipairs(self:GetChildren()) do if child.ClassName == class then return child end end
 end
-function object:IsA(class) return self.ClassName == class end
+function object:IsA(class)
+    if class=='GuiObject'then return self.ClassName=='Frame'or self.ClassName=='ScrollingFrame'or self.ClassName=='TextButton'or self.ClassName=='TextLabel'or self.ClassName=='ImageLabel'or self.ClassName=='TextBox' end
+    if class=='GuiButton'then return self.ClassName=='TextButton'or self.ClassName=='ImageButton'end
+    return self.ClassName==class
+end
 typeof = function(value) return type(value) == 'table' and value.ClassName and 'Instance' or type(value) end
 function object:Destroy()
     for _, child in ipairs(self:GetChildren()) do child:Destroy() end
@@ -134,7 +145,7 @@ app.Navigation:Show("home")
 assert(app.Flows.Control.PerspectivaCamara == app.Legacy.SpectatorController and not app.Flows.Control.PerspectivaCamara:IsActive())
 assert(app.Flows.Control.Vuelo == app.Legacy.FlightController and not app.Flows.Control.Vuelo:IsFlying())
 assert(app.Flows.Control.Velocidad == app.Legacy.MovementControlController and not app.Flows.Control.Velocidad.WalkSpeedEnabled)
-assert(app.Navigation.Selected == "home" and app.Window.Frame.AbsoluteSize.X == 860)
+assert(app.Navigation.Selected == "home" and app.Window.Frame.AbsoluteSize.X == 760)
 assert(app.Flows.Volar.SinObjetivo==app.Legacy.Fling2AutoController and app.Flows.Volar.EficienteCorto:IsShortDisplacementEnabled())
 assert(app.Flows.Volar.PorContacto==app.Legacy.AdjustableContactFlingController and app.Flows.Ancla.Normal==app.Legacy.AnchorCore)
 assert(app.Flows.Volar.ConVehiculos2.Delta==app.Legacy.CarFling2Delta and app.Flows.Volar.ConVehiculos2.Xeno==app.Legacy.CarFling2Xeno)
@@ -169,14 +180,57 @@ local function find(parent, name)
         local nested = find(child, name);if nested then return nested end
     end
 end
+local function textButton(root,prefix)
+    for _, child in ipairs(root:GetDescendants())do
+        if child.ClassName=='TextButton'and type(child.Text)=='string'and child.Text:sub(1,#prefix)==prefix then return child end
+    end
+    error('missing button: '..prefix)
+end
+app.Navigation:Show('control')
+local panel=app.Navigation.Pages.control
+textButton(panel,'Vuelo').Activated:Fire()
+local flight=app.Flows.Control.Vuelo
+local baseStart,baseStop=flight.Start,flight.Stop
+flight.Start=function(self)self.Flying=true;return true end
+flight.Stop=function(self)self.Flying=false end
+textButton(panel,'Activar vuelo').Activated:Fire()
+assert(flight.Flying,'flight button calls the registered controller')
+textButton(panel,'Activar vuelo').Activated:Fire();assert(not flight.Flying)
+flight.Start,flight.Stop=baseStart,baseStop
+textButton(panel,'Salto continuo').Activated:Fire()
+textButton(panel,'Salto continuo  ').Activated:Fire()
+assert(app.Flows.Control.SaltoContinuo.Enabled,'continuous jump toggle connected')
+app.Flows.Control.SaltoContinuo:SetEnabled(false)
+local movement=app.Flows.Movimientos
+local oldEnsure,oldContext=movement.EnsureLoaded,movement.Context
+local played,favorites=0,{}
+local fake={Settings={showHUD=true},Emotes={{id=11,name='Saludo'},{id=12,name='Baile'}},AnimationPacks={},EmotesById={},
+    IsFavorite=function(id)return favorites[id]==true end,
+    ToggleFavorite=function(id)favorites[id]=not favorites[id];return favorites[id]end,
+    PlayEmote=function(id)played=id end,StartCombo=function()end,StopEmote=function()end}
+movement.EnsureLoaded=function()return true,fake end
+app.Navigation:Reload('movimientos')
+local catalog=app.Navigation.Pages.movimientos
+assert(find(catalog,'CatalogGrid'),'real catalog replaces informational cards')
+find(catalog,'Play').Activated:Fire();assert(played==11,'thumbnail starts selected emote')
+textButton(catalog,'☆').Activated:Fire();assert(favorites[11],'favorite control wired')
+local search=find(catalog,'CatalogSearch');search.Text='Baile';search:GetPropertyChangedSignal('Text'):Fire()
+find(catalog,'Play').Activated:Fire();assert(played==12,'search filters playable items')
+movement.EnsureLoaded,movement.Context=oldEnsure,oldContext
+app.Navigation:Reload('movimientos')
+for _, page in pairs(app.Navigation.Pages)do
+    for _, item in ipairs(page:GetDescendants())do
+        assert(not(type(item.Text)=='string'and item.Text:find('No se pudo abrir:',1,true)),item.Text)
+    end
+end
 local grip = find(app.Window.Gui, "Resize")
 local pointer = {UserInputType = Enum.UserInputType.Touch, Position = v(0, 0)}
 grip.InputBegan:Fire(pointer)
 pointer.Position = v(-100, -50);input.InputChanged:Fire(pointer);input.InputEnded:Fire(pointer)
-assert(app.Window.Frame.AbsoluteSize.X == 760 and writes == 1, "touch resizing saves only on release")
+assert(app.Window.Frame.AbsoluteSize.X == 660 and writes == 1, "touch resizing saves only on release")
 camera.ViewportSize = v(400, 700);camera:GetPropertyChangedSignal("ViewportSize"):Fire()
 assert(app.Window.Compact and app.Window.Frame.AbsoluteSize.X == 376)
-assert(app.Navigation.Buttons.home.Size.X.Offset == 124, "compact navigation must fit horizontally")
+assert(app.Navigation.Buttons.home.Size.X.Offset == 108, "compact navigation must fit horizontally")
 local first = app
 app = assert(load(sources["main.lua"]))()
 assert(not first.Alive and first.Window.Gui.Destroyed and app.Alive and not originalGui.Destroyed)
