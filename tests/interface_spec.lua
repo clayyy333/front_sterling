@@ -42,6 +42,8 @@ function UDim2.fromScale(x, y) return UDim2.new(x, 0, y, 0) end
 math.clamp = function(n, low, high) return math.max(low, math.min(high, n)) end
 NumberSequence={new=function(v)return v end}
 NumberSequenceKeypoint={new=function(t,v)return {Time=t,Value=v}end}
+ColorSequence={new=function(v)return v end}
+ColorSequenceKeypoint={new=function(t,v)return {Time=t,Value=v}end}
 Color3 = {fromRGB = function(...) return {...} end}
 Enum = {
     KeyCode = {W=1,S=2,A=3,D=4,Space=5,LeftControl=6,C=7,LeftShift=8},
@@ -134,6 +136,16 @@ environment.__VR7_CONTACT_FLING_CLEANUP=environment.__VR7_CONTACT_ADJUSTABLE_CLE
 getgenv = function() return environment end
 readfile = function(path)
     local relative = path:gsub("^front_sterling/", "")
+    if relative=='modules/manifest.lua'then
+        local splash=playerGui:FindFirstChild('SterlingLoading')
+        local named={}
+        for _,part in ipairs(splash:GetDescendants())do if part.Name then named[part.Name]=part end end
+        assert(named.LowerShade.Size.Y.Scale==1 and named.LowerShade:FindFirstChildOfClass('UICorner'),'bottom shading must respect all rounded corners')
+        assert(named.Brand.Position.Y.Offset>named.LoadingCard.Size.Y.Offset*(named.LoadingCard.Size.X.Offset>500 and .6 or .45),'title sits below the portrait')
+        assert(named.Brand.Position.Y.Offset+named.Brand.Size.Y.Offset<named.Subtitle.Position.Y.Offset,'title/subtitle do not overlap')
+        assert(named.Subtitle.Position.Y.Offset+named.Subtitle.Size.Y.Offset<named.LoadingCard.Size.Y.Offset-48,'names clear the loading footer')
+        assert(named.OuterRim:FindFirstChildOfClass('UIGradient') and named.BrandDepth,'rim and title have depth')
+    end
     assert(sources[relative], "not found: " .. path)
     return sources[relative]
 end
