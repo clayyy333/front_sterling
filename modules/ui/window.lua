@@ -7,34 +7,14 @@ return function(app)
     app:OnCleanup(function() gui:Destroy() end)
     local window = ui:Round(ui:Create("Frame", {
         Name = "Window", AnchorPoint = Vector2.new(.5, .5), Position = UDim2.fromScale(.5, .5),
-        BackgroundColor3 = theme.Background, BorderSizePixel = 0, ClipsDescendants = true,
+        BackgroundColor3 = theme.Surface, BorderSizePixel = 0, ClipsDescendants = true,
     }, gui), 16)
-    ui:Create("UIStroke", {Color = theme.Line, Thickness = 1}, window)
-    -- Soft, static shadow layers: no texture download or animation loop.
-    local shadows = {}
-    for index = 3, 1, -1 do
-        shadows[#shadows+1] = ui:Round(ui:Create("Frame", {
-            Name="WindowShadow", AnchorPoint=Vector2.new(.5,.5), BorderSizePixel=0,
-            BackgroundColor3=Color3.fromRGB(0,0,0), BackgroundTransparency=.89+index*.02,
-            ZIndex=1,
-        }, gui),16+index*4)
-    end
     window.ZIndex=2
-    local function updateShadows()
-        for index, shadow in ipairs(shadows) do
-            local spread=(4-index)*8
-            shadow.Position=UDim2.new(window.Position.X.Scale,window.Position.X.Offset,
-                window.Position.Y.Scale,window.Position.Y.Offset+5)
-            shadow.Size=UDim2.new(window.Size.X.Scale,window.Size.X.Offset+spread,
-                window.Size.Y.Scale,window.Size.Y.Offset+spread)
-            shadow.Visible=window.Visible
-        end
-    end
-    app:Connect(window:GetPropertyChangedSignal("Position"),updateShadows)
-    app:Connect(window:GetPropertyChangedSignal("Size"),updateShadows)
-    app:Connect(window:GetPropertyChangedSignal("Visible"),updateShadows)
+    local edgeLights=ui:EdgeLights(gui,window,2)
+    local bodySurface=ui:Round(ui:Create("Frame",{Name="BodySurface",BackgroundColor3=theme.Background,
+        BorderSizePixel=0},window),16)
     local header = ui:Create("Frame", {
-        Name = "Header", Size = UDim2.new(1, 0, 0, 48), BackgroundColor3 = theme.Surface,
+        Name = "Header", Size = UDim2.new(1, 0, 0, 48), BackgroundTransparency = 1,
         BorderSizePixel = 0, Active = true,
     }, window)
     local monogram = ui:Button(header, "S", true)
@@ -46,7 +26,7 @@ return function(app)
     minimize.Position = UDim2.new(1, -88, 0, 11);minimize.Size = UDim2.fromOffset(32, 32)
     local close = ui:Button(header, "×")
     close.TextSize = 23;close.Position = UDim2.new(1, -48, 0, 11);close.Size = UDim2.fromOffset(32, 32)
-    local sidebar = ui:Create("Frame", {Name = "Sidebar", BackgroundColor3 = theme.Surface, BorderSizePixel = 0}, window)
+    local sidebar = ui:Create("Frame", {Name = "Sidebar", BackgroundTransparency = 1, BorderSizePixel = 0}, window)
     local navigation = ui:Create("ScrollingFrame", {
         Name = "Navigation", BackgroundTransparency = 1, BorderSizePixel = 0,
         ScrollBarThickness = 2, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), Active = true,
@@ -62,7 +42,7 @@ return function(app)
     }, body)
     local grip = ui:Create("TextButton", {
         Name = "Resize", Text = "◢", TextSize = 16, TextColor3 = theme.Muted,
-        BackgroundTransparency = 1, Position = UDim2.new(1, -26, 1, -26), Size = UDim2.fromOffset(24, 24), ZIndex = 20,
+        BackgroundTransparency = 1, Position = UDim2.new(1, -32, 1, -32), Size = UDim2.fromOffset(24, 24), ZIndex = 20,
     }, window)
     local launcher = ui:Button(gui, "S", true)
     launcher.Name = "Launcher";launcher.Size = UDim2.fromOffset(44, 44)
@@ -81,6 +61,7 @@ return function(app)
         window.Size = UDim2.fromOffset(width, height)
         self.Compact = width < 620
         if self.Compact then
+            bodySurface.Position=UDim2.fromOffset(0,100);bodySurface.Size=UDim2.new(1,0,1,-100)
             sidebar.Position = UDim2.fromOffset(0, 48);sidebar.Size = UDim2.new(1, 0, 0, 52)
             navigation.Position = UDim2.fromOffset(12, 6);navigation.Size = UDim2.new(1, -24, 1, -12)
             navigation.AutomaticCanvasSize = Enum.AutomaticSize.X;navigation.ScrollingDirection = Enum.ScrollingDirection.X
@@ -88,6 +69,7 @@ return function(app)
             body.Position = UDim2.fromOffset(14, 106);body.Size = UDim2.new(1, -28, 1, -126)
             heading.TextSize = 19
         else
+            bodySurface.Position=UDim2.fromOffset(152,48);bodySurface.Size=UDim2.new(1,-152,1,-48)
             sidebar.Position = UDim2.fromOffset(0, 48);sidebar.Size = UDim2.new(0, 152, 1, -48)
             navigation.Position = UDim2.fromOffset(12, 20);navigation.Size = UDim2.new(1, -24, 1, -40)
             navigation.AutomaticCanvasSize = Enum.AutomaticSize.Y;navigation.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -159,7 +141,6 @@ return function(app)
     app:Connect(workspace:GetPropertyChangedSignal("CurrentCamera"), bindCamera)
     app:OnCleanup(function() if cameraConnection then cameraConnection:Disconnect() end end)
     bindCamera()
-    updateShadows()
     app.Legacy.gui=gui
     return controller
 end

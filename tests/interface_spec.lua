@@ -126,6 +126,7 @@ local tweens={}
 local tweenService={Create=function(_,object,info,goal)
     local tween={Object=object,Info=info,Goal=goal}
     function tween:Play()self.Playing=true end
+    function tween:Pause()self.Playing=false;self.Paused=true end
     function tween:Cancel()self.Playing=false;self.Cancelled=true end
     tweens[#tweens+1]=tween;return tween
 end}
@@ -251,6 +252,16 @@ for _, page in pairs(app.Navigation.Pages)do
         assert(not(type(item.Text)=='string'and item.Text:find('No se pudo abrir:',1,true)),item.Text)
     end
 end
+local lights=find(app.Window.Gui,'WindowEdgeLights')
+assert(lights and not find(app.Window.Gui,'WindowShadow'),'main window uses soft top/bottom light instead of solid shadow layers')
+assert(find(app.Window.Gui,'Header').BackgroundTransparency==1 and find(app.Window.Gui,'Sidebar').BackgroundTransparency==1,'header/sidebar cannot square off outer corners')
+assert(find(app.Window.Gui,'BodySurface'):FindFirstChildOfClass('UICorner'),'content surface respects rounded lower corners')
+app.Window.Gui:GetPropertyChangedSignal('Enabled'):Fire()
+assert(lights.Visible and tweens[#tweens].Playing and tweens[#tweens].Info[1]==2,'main light motion is enabled at two seconds')
+app.Window.Frame.Visible=false;app.Window.Frame:GetPropertyChangedSignal('Visible'):Fire()
+assert(not lights.Visible and tweens[#tweens].Paused,'minimize pauses light animations')
+app.Window.Frame.Visible=true;app.Window.Frame:GetPropertyChangedSignal('Visible'):Fire()
+assert(lights.Visible and tweens[#tweens].Playing,'restore resumes lights')
 local grip = find(app.Window.Gui, "Resize")
 local pointer = {UserInputType = Enum.UserInputType.Touch, Position = v(0, 0)}
 grip.InputBegan:Fire(pointer)
