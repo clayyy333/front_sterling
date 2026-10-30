@@ -20,7 +20,7 @@ return function(app)
         for key, value in pairs(self.Pages) do value.Visible = key == id end
         for key, button in pairs(self.Buttons) do
             button.BackgroundColor3 = key == id and theme.Selected or theme.Surface
-            button.TextColor3 = key == id and theme.Accent or theme.Muted
+            button.TextColor3 = key == id and theme.AccentText or theme.Muted
         end
         self.Selected = id
         window:SetTitle(feature.Title, feature.Subtitle)

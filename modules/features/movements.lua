@@ -61,27 +61,19 @@ return function(app)
                     local pageText=ui:Label(tools,"1 / 1",11);pageText.Position=UDim2.new(1,-102,0,0);pageText.Size=UDim2.fromOffset(68,36)
                     local next=ui:Button(tools,"›");next.Position=UDim2.new(1,-30,0,0);next.Size=UDim2.fromOffset(30,36)
                     local count=ui:Note(content,"");count.Size=UDim2.new(1,0,0,18);count.LayoutOrder=-9
-                    local animationState="Completo"
+                    local animationPicker=ui:AnimationPicker(scope,c,status)
                     if id=="animations"then
-                        local choose=ui:Select(content,scope,"Aplicar paquete completo",function()
-                            local result={}
-                            for _,entry in ipairs({{"Completo","Paquete completo"},{"Idle","En reposo"},{"Walk","Caminar"},{"Run","Correr"},{"Jump","Saltar"},{"Fall","Caer"},{"Climb","Trepar"},{"Swim","Nadar"}})do
-                                result[#result+1]={Value=entry[1],Label=entry[2]}
-                            end
-                            return result
-                        end,function(v)animationState=v end)
-                        choose.Parent.LayoutOrder=-8
-                        ui:Action(content,scope,"Guardar combinación actual",function()
-                            status.Text=c.SaveAnimationCombination()and "Combinación guardada."or"No se pudo guardar. Comprueba tu selección y el límite de 3."
-                        end)
-                        ui:Select(content,scope,"Aplicar combinación guardada",function()
-                            local result={}
-                            for index,profile in ipairs(c.GetSavedAnimationCombinations())do result[#result+1]={Value=index,Label=profile.name}end
-                            return result
-                        end,function(index)c.ApplyAnimationCombination(index)end)
-                        ui:Action(content,scope,"Restaurar animaciones originales",function()c.RemoveAnimationPacks();status.Text="Animaciones restauradas."end)
+                        local actions=ui:Create("Frame",{Name="AnimationTools",Size=UDim2.new(1,0,0,36),BackgroundTransparency=1,LayoutOrder=-8},content)
+                        for index,entry in ipairs({{"Mi mezcla",function()animationPicker:OpenCurrent()end},
+                            {"Guardar mezcla",function()animationPicker:Save()end},
+                            {"Guardadas",function()animationPicker:OpenSaved()end}})do
+                            local button=ui:Action(actions,scope,entry[1],entry[2])
+                            button.Size=UDim2.new(1/3,-6,1,0);button.Position=UDim2.new((index-1)/3,0,0,0);button.TextSize=11
+                        end
+                        local hint=ui:Note(content,"Toca un paquete para equiparlo completo o elegir qué parte mezclar.")
+                        hint.LayoutOrder=-7;hint.Size=UDim2.new(1,0,0,30)
                     end
-                    local grid=ui:Create("Frame",{Name="CatalogGrid",Size=UDim2.new(1,0,0,0),BackgroundTransparency=1,LayoutOrder=-8},content)
+                    local grid=ui:Create("Frame",{Name="CatalogGrid",Size=UDim2.new(1,0,0,0),BackgroundTransparency=1,LayoutOrder=-6},content)
                     local layout=ui:Create("UIGridLayout",{CellPadding=UDim2.fromOffset(8,8),SortOrder=Enum.SortOrder.LayoutOrder},grid)
                     local items,page,version={},1,0
                     local cardsScope
@@ -107,7 +99,7 @@ return function(app)
                                 Image="rbxthumb://type="..(item.isAnimationPack and "BundleThumbnail" or "Asset").."&id="..tostring(item.bundleId or item.id).."&w=150&h=150"},button)
                             local name=ui:Label(button,item.name,11);name.Position=UDim2.fromOffset(7,84);name.Size=UDim2.new(1,-14,0,28)
                             cardsScope:Connect(button.Activated,function()
-                                if item.isAnimationPack and animationState~="Completo"then c.EquipAnimationPart(item,animationState)else play(c,item)end
+                                if item.isAnimationPack then animationPicker:OpenPack(item)else play(c,item)end
                                 status.Text=item.name
                             end)
                             local fav=ui:Create("TextButton",{Text=c.IsFavorite(item.bundleId or item.id) and "★" or "☆",Size=UDim2.fromOffset(30,26),
@@ -115,7 +107,7 @@ return function(app)
                             cardsScope:Connect(fav.Activated,function()
                                 local added=c.ToggleFavorite(item.bundleId or item.id);fav.Text=added and "★" or "☆"
                             end)
-                            if not item.isAnimationPack then
+                            if id=="emotes" and not item.isAnimationPack then
                                 local add=ui:Create("TextButton",{Text="+ combo",Font=Enum.Font.Gotham,TextSize=10,TextColor3=theme.Muted,
                                     Size=UDim2.new(1,-36,0,26),Position=UDim2.new(0,3,1,-28),BackgroundTransparency=1},tile)
                                 cardsScope:Connect(add.Activated,function()
@@ -150,12 +142,16 @@ return function(app)
                     scope:Connect(previous.Activated,function()page=math.max(1,page-1);draw()end)
                     scope:Connect(next.Activated,function()page=page+1;draw()end)
                     scope:Connect(body:GetPropertyChangedSignal("AbsoluteSize"),draw)
-                    ui:Action(content,scope,"Reproducir combo",function()
-                        if #combo==0 then status.Text="Añade hasta 3 emotes con + combo.";return end
-                        c.StartCombo(combo);status.Text="Combo en reproducción."
-                    end,true)
-                    ui:Action(content,scope,"Vaciar combo",function()combo={};status.Text="Combo vacío."end)
-                    ui:Action(content,scope,"Detener",function()stop(c);status.Text="Reproducción detenida."end)
+                    if id=="emotes"then
+                        ui:Action(content,scope,"Reproducir combo",function()
+                            if #combo==0 then status.Text="Añade hasta 3 emotes con + combo.";return end
+                            c.StartCombo(combo);status.Text="Combo en reproducción."
+                        end,true)
+                        ui:Action(content,scope,"Vaciar combo",function()combo={};status.Text="Combo vacío."end)
+                    end
+                    if id~="animations"then
+                        ui:Action(content,scope,"Detener",function()stop(c);status.Text="Reproducción detenida."end)
+                    end
                     filter()
                 end)
             end)

@@ -7,7 +7,7 @@ return {
     },
     core = {
         "core/lifecycle", "core/config", "core/services", "core/storage",
-        "ui/theme", "ui/components", "ui/edge_lights", "ui/controls", "core/features", "core/legacy_context", "ui/window", "ui/navigation",
+        "ui/theme", "ui/components", "ui/edge_lights", "ui/controls", "ui/animation_picker", "core/features", "core/legacy_context", "ui/window", "ui/navigation",
     },
     legacy = {
         "player/anchor", "player/anchor_force_return", "player/static_noclip_anchor",

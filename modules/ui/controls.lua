@@ -73,7 +73,7 @@ return function(app)
             local active=get()==true
             button.Text=text..(active and "  ·  ON" or "  ·  OFF")
             button.BackgroundColor3=active and theme.Selected or theme.Raised
-            button.TextColor3=active and theme.Accent or theme.Text
+            button.TextColor3=active and theme.AccentText or theme.Text
         end
         button=self:Action(parent,scope,text,function()
             local ok,err=set(not get())
@@ -197,7 +197,7 @@ return function(app)
             active=ui:Scope()
             for key, button in pairs(buttons) do
                 button.BackgroundColor3=key==id and theme.Selected or theme.Raised
-                button.TextColor3=key==id and theme.Accent or theme.Muted
+                button.TextColor3=key==id and theme.AccentText or theme.Muted
             end
             local ok,err=pcall(mount,id,body,active)
             if not ok then ui:Note(body,"No se pudo abrir: "..tostring(err)) end

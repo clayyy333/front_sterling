@@ -237,6 +237,21 @@ local fake={Settings={showHUD=true},Emotes={{id=11,name='Saludo'},{id=12,name='B
     IsFavorite=function(id)return favorites[id]==true end,
     ToggleFavorite=function(id)favorites[id]=not favorites[id];return favorites[id]end,
     PlayEmote=function(id)played=id end,StartCombo=function()end,StopEmote=function()end}
+local savedMixes={}
+fake.Settings.animationPackSelection={}
+fake.AnimationPacks={{id='anim_1',bundleId=1,name='Alpha',isAnimationPack=true},{id='anim_2',bundleId=2,name='Beta',isAnimationPack=true}}
+fake.EquipAnimationPart=function(pack,state)
+    fake.Settings.animationPackSelection[state]={id=pack.bundleId,name=pack.name};return true
+end
+fake.EquipAnimationPack=function()return true end
+fake.SaveAnimationCombination=function()
+    local selection={};for k,v in pairs(fake.Settings.animationPackSelection)do selection[k]=v end
+    savedMixes[#savedMixes+1]={name='Mezcla '..#savedMixes+1,selection=selection};return true
+end
+fake.GetSavedAnimationCombinations=function()return savedMixes end
+fake.ApplyAnimationCombination=function(index)fake.Settings.animationPackSelection=savedMixes[index].selection;return true end
+fake.DeleteAnimationCombination=function(index)table.remove(savedMixes,index);return true end
+fake.RemoveAnimationPacks=function()fake.Settings.animationPackSelection={}end
 movement.EnsureLoaded=function()return true,fake end
 app.Navigation:Reload('movimientos')
 local catalog=app.Navigation.Pages.movimientos
@@ -245,6 +260,26 @@ find(catalog,'Play').Activated:Fire();assert(played==11,'thumbnail starts select
 textButton(catalog,'☆').Activated:Fire();assert(favorites[11],'favorite control wired')
 local search=find(catalog,'CatalogSearch');search.Text='Baile';search:GetPropertyChangedSignal('Text'):Fire()
 find(catalog,'Play').Activated:Fire();assert(played==12,'search filters playable items')
+textButton(catalog,'Animaciones').Activated:Fire()
+local grid=find(catalog,'CatalogGrid')
+local tiles={};for _,child in ipairs(grid:GetChildren())do if child.ClassName=='Frame'then tiles[#tiles+1]=child end end
+find(tiles[1],'Play').Activated:Fire()
+textButton(app.Window.Gui,'Caminar').Activated:Fire()
+find(tiles[2],'Play').Activated:Fire()
+textButton(app.Window.Gui,'Correr').Activated:Fire()
+assert(fake.Settings.animationPackSelection.Walk.name=='Alpha'and fake.Settings.animationPackSelection.Run.name=='Beta','picker mixes states from different packs')
+textButton(catalog,'Guardar mezcla').Activated:Fire()
+assert(#savedMixes==1 and savedMixes[1].selection.Walk.name=='Alpha'and savedMixes[1].selection.Run.name=='Beta','save keeps the mixed states')
+textButton(catalog,'Guardadas').Activated:Fire()
+textButton(app.Window.Gui,'Aplicar · ').Activated:Fire()
+assert(not find(app.Window.Gui,'AnimationPicker'),'saved selection applies and closes')
+textButton(catalog,'Guardadas').Activated:Fire()
+textButton(app.Window.Gui,'Eliminar · ').Activated:Fire()
+assert(#savedMixes==0,'saved mix can be removed')
+for _,child in ipairs(catalog:GetDescendants())do assert(child.Text~='Reproducir combo'and child.Text~='Vaciar combo','animation tab cannot show emote combo actions')end
+textButton(find(app.Window.Gui,'AnimationPicker'),'×').Activated:Fire()
+assert(find(app.Window.Gui,'Wordmark')and not find(app.Window.Gui,'Monogram'),'header uses styled name')
+assert(app.Navigation.Buttons.movimientos.TextColor3==app.Theme.AccentText,'selected button text uses warm white')
 movement.EnsureLoaded,movement.Context=oldEnsure,oldContext
 app.Navigation:Reload('movimientos')
 for _, page in pairs(app.Navigation.Pages)do

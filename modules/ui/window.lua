@@ -17,11 +17,15 @@ return function(app)
         Name = "Header", Size = UDim2.new(1, 0, 0, 48), BackgroundTransparency = 1,
         BorderSizePixel = 0, Active = true,
     }, window)
-    local monogram = ui:Button(header, "S", true)
-    monogram.Size = UDim2.fromOffset(30, 30);monogram.Position = UDim2.fromOffset(14, 12)
-    monogram.Active = false;monogram.AutoButtonColor = false
-    local name = ui:Label(header, app.Config.Name, 14)
-    name.Font = Enum.Font.GothamBold;name.Position = UDim2.fromOffset(56, 11);name.Size = UDim2.new(1, -170, 0, 30)
+    local wordmarkShadow=ui:Label(header,app.Config.Name,25)
+    wordmarkShadow.Name="WordmarkShadow";wordmarkShadow.Font=Enum.Font.Garamond
+    wordmarkShadow.TextColor3=Color3.fromRGB(0,0,0);wordmarkShadow.TextTransparency=.18
+    wordmarkShadow.Position=UDim2.fromOffset(21,12);wordmarkShadow.Size=UDim2.new(1,-132,0,32)
+    local name=ui:Label(header,app.Config.Name,25)
+    name.Name="Wordmark";name.Font=Enum.Font.Garamond
+    name.TextColor3=Color3.fromRGB(255,238,246)
+    name.TextStrokeColor3=Color3.fromRGB(23,10,20);name.TextStrokeTransparency=.55
+    name.Position=UDim2.fromOffset(20,10);name.Size=UDim2.new(1,-132,0,32)
     local minimize = ui:Button(header, "—")
     minimize.Position = UDim2.new(1, -88, 0, 11);minimize.Size = UDim2.fromOffset(32, 32)
     local close = ui:Button(header, "×")
@@ -44,7 +48,7 @@ return function(app)
         Name = "Resize", Text = "◢", TextSize = 16, TextColor3 = theme.Muted,
         BackgroundTransparency = 1, Position = UDim2.new(1, -32, 1, -32), Size = UDim2.fromOffset(24, 24), ZIndex = 20,
     }, window)
-    local launcher = ui:Button(gui, "S", true)
+    local launcher = ui:Button(gui, "LM", true)
     launcher.Name = "Launcher";launcher.Size = UDim2.fromOffset(44, 44)
     launcher.Position = UDim2.new(0, 16, .5, -22);launcher.Visible = false;launcher.ZIndex = 30
     local controller = {Gui = gui, Frame = window, Nav = navigation, Pages = pages, Compact = false}
