@@ -3,6 +3,8 @@ return function(app)
     function ui:Create(class, properties, parent)
         local object = Instance.new(class)
         for key, value in pairs(properties or {}) do object[key] = value end
+        if class=="UIStroke" then object.ApplyStrokeMode=Enum.ApplyStrokeMode.Border end
+        if class=="TextButton"or class=="TextLabel"or class=="TextBox"then object.TextStrokeTransparency=1 end
         object.Parent = parent
         if app.Appearance then app.Appearance:Register(object,properties or {})end
         return object

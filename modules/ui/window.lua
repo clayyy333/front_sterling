@@ -27,16 +27,18 @@ return function(app)
         local shade=ui:Create("Frame",{Name="SoftShade",Size=UDim2.new(1,0,0,1),Position=UDim2.fromOffset(0,row),
             BorderSizePixel=0,BackgroundColor3=theme.Accent,
             BackgroundTransparency=1-.25*math.exp(-((distance/3.5)^2))},wordmarkGlow)
+        app.Appearance:BindColor(shade,"BackgroundColor3","Accent")
         ui:Create("UIGradient",{Transparency=wordmarkFade},shade)
     end
     local wordmarkShadow=ui:Label(header,app.Config.Name,25)
     wordmarkShadow.Name="WordmarkShadow";wordmarkShadow.Font=Enum.Font.Bodoni
-    wordmarkShadow.TextColor3=Color3.fromRGB(0,0,0);wordmarkShadow.TextTransparency=.18
+    wordmarkShadow.TextColor3=theme.Accent;wordmarkShadow.TextTransparency=.9
+    app.Appearance:BindColor(wordmarkShadow,"TextColor3","Accent")
     wordmarkShadow.Position=UDim2.fromOffset(21,12);wordmarkShadow.Size=UDim2.new(1,-132,0,32)
     local name=ui:Label(header,app.Config.Name,25)
     name.Name="Wordmark";name.Font=Enum.Font.Bodoni
     name.TextColor3=theme.Text
-    name.TextStrokeColor3=Color3.fromRGB(23,10,20);name.TextStrokeTransparency=.55
+    name.TextStrokeTransparency=1
     name.Position=UDim2.fromOffset(20,10);name.Size=UDim2.new(1,-132,0,32)
     local function fitWordmarkGlow()
         local bounds=name.TextBounds

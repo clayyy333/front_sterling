@@ -34,6 +34,7 @@ return function(app)
     end
     function ui:Note(parent,text)
         local label=self:Label(parent,text,12);label.TextColor3=theme.Muted
+        app.Appearance:BindColor(label,"TextColor3","Muted")
         label.Size=UDim2.new(1,-8,0,36);return label
     end
     function ui:Status(parent,scope)
@@ -103,14 +104,21 @@ return function(app)
         end)
         return input
     end
-    function ui:Range(parent,scope,title,value,minimum,maximum,setter,logarithmic)
+    function ui:Range(parent,scope,title,value,minimum,maximum,setter,logarithmic,sliderOnly)
         local input=self:Number(parent,scope,title,value,setter)
-        local row=input.Parent;row.Size=UDim2.new(1,-2,0,58)
+        local row=input.Parent;row.Size=UDim2.new(1,-2,0,66)
         input.Size=UDim2.new(.38,0,0,32)
+        if sliderOnly then
+            input.Visible=false
+            local valueLabel=self:Label(row,tostring(value).."%",12)
+            valueLabel.Name="SliderValue";valueLabel.TextXAlignment=Enum.TextXAlignment.Right
+            valueLabel.Position=UDim2.fromScale(.8,0);valueLabel.Size=UDim2.new(.2,-8,0,32)
+            scope:Connect(input:GetPropertyChangedSignal("Text"),function()valueLabel.Text=input.Text.."%"end)
+        end
         for _,child in ipairs(row:GetChildren())do if child:IsA("TextLabel")then child.Size=UDim2.new(.62,-12,0,32)end end
         local track=self:Round(self:Create("TextButton",{Name="Slider",Text="",Active=true,
-            Position=UDim2.fromOffset(0,41),Size=UDim2.new(1,0,0,14),BackgroundTransparency=1},row),4)
-        local line=self:Round(self:Create("Frame",{Size=UDim2.new(1,0,0,4),Position=UDim2.fromOffset(0,5),BackgroundColor3=theme.Line,BorderSizePixel=0},track),2)
+            Position=UDim2.fromOffset(8,37),Size=UDim2.new(1,-16,0,24),BackgroundTransparency=1,BorderSizePixel=0},row),4)
+        local line=self:Round(self:Create("Frame",{Size=UDim2.new(1,0,0,4),Position=UDim2.fromOffset(0,10),BackgroundColor3=theme.Line,BorderSizePixel=0},track),2)
         local fill=self:Round(self:Create("Frame",{Size=UDim2.fromScale(0,1),BackgroundColor3=theme.Accent,BorderSizePixel=0},line),2)
         local knob=self:Round(self:Create("Frame",{Size=UDim2.fromOffset(12,12),AnchorPoint=Vector2.new(.5,.5),BackgroundColor3=theme.Text,BorderSizePixel=0},track),6)
         local function position(n)
@@ -142,7 +150,7 @@ return function(app)
         local button=self:Button(row,title);button.Size=UDim2.new(1,-42,1,0)
         button.TextXAlignment=Enum.TextXAlignment.Left
         self:Create("UIPadding",{PaddingLeft=UDim.new(0,12)},button)
-        local refresh=self:Button(row,"↻");refresh.Position=UDim2.new(1,-36,0,0);refresh.Size=UDim2.fromOffset(36,38)
+        local refresh=self:Button(row,">");refresh.Position=UDim2.new(1,-36,0,0);refresh.Size=UDim2.fromOffset(36,38)
         local list=self:Create("ScrollingFrame",{Visible=false,Size=UDim2.new(1,-2,0,146),
             BackgroundColor3=theme.Surface,BorderSizePixel=0,ScrollBarThickness=3,
             AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},parent)
@@ -154,7 +162,7 @@ return function(app)
             choices=ui:Scope();choices.OnError=scope.OnError
             for _, child in ipairs(list:GetChildren()) do if child:IsA("GuiButton") or child:IsA("TextLabel") then child:Destroy() end end
             local items=options()
-            if #items==0 then ui:Note(list,"No hay opciones disponibles. Usa ↻ para actualizar.") end
+            if #items==0 then ui:Note(list,"No hay opciones disponibles. Usa > para actualizar.") end
             for _, item in ipairs(items) do
                 local value=item.Value
                 local option=ui:Action(list,choices,item.Label,function()

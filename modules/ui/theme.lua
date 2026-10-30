@@ -38,6 +38,12 @@ return function(app)
         end
         if #entry.Colors>0 or entry.BaseTransparency then registry[object]=entry end
     end
+    function appearance:BindColor(object,property,key)
+        local entry=registry[object]
+        if not entry then entry={Colors={},Roles={}};registry[object]=entry end
+        if not entry.Roles[property]then entry.Colors[#entry.Colors+1]=property end
+        entry.Roles[property]=key;object[property]=theme[key]
+    end
     function appearance:SetTheme(id)
         if not palettes[id]then return false,"Tema no disponible."end
         local old={};for key,value in pairs(theme)do old[key]=value end

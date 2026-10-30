@@ -47,6 +47,7 @@ ColorSequenceKeypoint={new=function(t,v)return {Time=t,Value=v}end}
 Color3 = {fromRGB = function(...) return {...} end}
 TweenInfo={new=function(...)return {...}end}
 Enum = {
+    ApplyStrokeMode={Border=1},
     EasingStyle={Linear=1,Sine=2},EasingDirection={InOut=1},
     KeyCode = {W=1,S=2,A=3,D=4,Space=5,LeftControl=6,C=7,LeftShift=8},
     Font = {Gotham = 1, GothamBold = 2, GothamMedium = 3, Garamond=4,Bodoni=5},
@@ -311,6 +312,14 @@ end
 local sliderCount=0
 for _,item in ipairs(preferences:GetDescendants())do if item.Name=='Slider'then sliderCount=sliderCount+1 end end
 assert(sliderCount==2,'transparency and emote speed both have sliders')
+local percentLabel
+for _,item in ipairs(preferences:GetDescendants())do
+    if item.Name=='SliderValue'then percentLabel=item end
+    if item:IsA('TextButton')then assert(item.TextStrokeTransparency==1,'button lettering has no outline')end
+    if item.ClassName=='UIStroke'then assert(item.ApplyStrokeMode==Enum.ApplyStrokeMode.Border,'strokes belong to widget borders')end
+end
+assert(percentLabel and percentLabel.Parent:FindFirstChild('Value').Visible==false,'transparency uses a readout without an editable input')
+
 app.Appearance:SetTheme('Blue');assert(app.Storage.Values.ColorTheme=='Blue'and app.Window.Frame.BackgroundColor3==app.Theme.Surface,'theme updates existing surfaces and persists')
 app.Appearance:SetTransparency(40);assert(app.Window.Frame.BackgroundTransparency==.4 and app.Storage.Values.GUITransparency==.4,'transparency applies and persists')
 assert(find(app.Window.Gui,'Wordmark').TextTransparency~= .4,'transparency leaves lettering readable')
@@ -318,6 +327,11 @@ local audios=new('Folder');audios.Name='Audios';audios.Parent=workspace
 local ambience=new('Sound');ambience.Name='Environment_City_Night';ambience.Volume=.6;ambience.Parent=audios
 assert(app.Flows.Audio:SetEnabled(false)and ambience.Volume==0,'sound option uses original ambient muting')
 assert(app.Flows.Audio:SetEnabled(true)and ambience.Volume==.6,'enabling restores original sound volume')
+app.Appearance:SetTheme('FrostedGlass')
+for _,item in ipairs(app.Window.Gui:GetDescendants())do
+    if item.Name=='SoftRed'or item.Name=='SoftShade'then assert(item.BackgroundColor3==app.Theme.Accent,'every glow follows the theme accent')end
+    if item.Name=='Wordmark'then assert(item.TextStrokeTransparency==1,'wordmark has no harsh outline')end
+end
 app.Appearance:SetTheme('Red');app.Appearance:SetTransparency(0)
 movement.EnsureLoaded,movement.Context=oldEnsure,oldContext
 app.Navigation:Reload('movimientos')
