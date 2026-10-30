@@ -109,9 +109,9 @@ return function(app)
                         local width=math.max(1,viewport.AbsoluteSize.X-10)
                         local columns=math.max(1,math.floor(width/((mobile and 55 or 75)+gap)))
                         local cardWidth=(width-gap*(columns-1))/columns
-                        local nameHeight=math.clamp(cardWidth*.35,18,28)
-                        local footerHeight=math.clamp(cardWidth*.3,18,24)
-                        local cardHeight=cardWidth+nameHeight+footerHeight
+                        local nameHeight=26
+                        local footerHeight=24
+                        local cardHeight=cardWidth+nameHeight+footerHeight+4
                         local available=math.max(1,viewport.AbsoluteSize.Y-4)
                         local rowHeight=cardHeight+gap
                         local rows=math.max(1,math.floor((available+gap)/rowHeight))
@@ -133,19 +133,22 @@ return function(app)
                             local button=ui:Create("TextButton",{Name="Play",Active=true,Text="",BorderSizePixel=0,Size=UDim2.new(1,0,1,-footerHeight),BackgroundTransparency=1},tile)
                             ui:Create("ImageLabel",{Size=UDim2.new(1,-(mobile and 4 or 6),0,imageHeight),Position=UDim2.fromOffset(mobile and 2 or 3,mobile and 2 or 3),BackgroundTransparency=1,
                                 Image="rbxthumb://type="..(item.isAnimationPack and "BundleThumbnail" or "Asset").."&id="..tostring(item.bundleId or item.id).."&w=150&h=150"},button)
-                            local name=ui:Label(button,item.name,10);name.Position=UDim2.fromOffset(3,cardWidth);name.Size=UDim2.new(1,-6,0,nameHeight)
+                            local name=ui:Label(button,item.name,10)
+                            name.Name="ItemName";name.Position=UDim2.fromOffset(4,cardWidth+1);name.Size=UDim2.new(1,-8,0,nameHeight)
+                            name.TextYAlignment=Enum.TextYAlignment.Top;name.TextTruncate=Enum.TextTruncate.AtEnd
+                            name.ClipsDescendants=true
                             cardsScope:Connect(button.Activated,function()
                                 if item.isAnimationPack then animationPicker:OpenPack(item)else play(c,item)end
                                 status.Text=item.name
                             end)
-                            local fav=ui:Create("TextButton",{Text=c.IsFavorite(item.bundleId or item.id) and "★" or "☆",Size=UDim2.fromOffset(22,footerHeight),
-                                Position=UDim2.new(1,-24,1,-footerHeight),BackgroundTransparency=1,BorderSizePixel=0,TextColor3=theme.Accent,TextSize=16},tile)
+                            local fav=ui:Create("TextButton",{Name="Favorite",Font=Enum.Font.Gotham,TextWrapped=false,Text=c.IsFavorite(item.bundleId or item.id) and "★" or "☆",Size=UDim2.fromOffset(22,22),
+                                Position=UDim2.new(1,-25,1,-footerHeight),BackgroundTransparency=1,BorderSizePixel=0,TextColor3=theme.Accent,TextSize=14},tile)
                             cardsScope:Connect(fav.Activated,function()
                                 local added=c.ToggleFavorite(item.bundleId or item.id);fav.Text=added and "★" or "☆"
                             end)
                             if id=="emotes" and not item.isAnimationPack then
-                                local add=ui:Create("TextButton",{Text="+ combo",Font=Enum.Font.Gotham,TextSize=8,TextColor3=theme.Muted,
-                                    Size=UDim2.new(1,-26,0,footerHeight),Position=UDim2.new(0,1,1,-footerHeight),BackgroundTransparency=1,BorderSizePixel=0},tile)
+                                local add=ui:Create("TextButton",{Name="AddToCombo",TextWrapped=false,TextTruncate=Enum.TextTruncate.AtEnd,Text="+ combo",Font=Enum.Font.Gotham,TextSize=8,TextColor3=theme.Muted,
+                                    Size=UDim2.new(1,-29,0,22),Position=UDim2.new(0,3,1,-footerHeight),BackgroundTransparency=1,BorderSizePixel=0},tile)
                                 cardsScope:Connect(add.Activated,function()
                                     if #combo>=3 then status.Text="El combo ya tiene 3 emotes.";return end
                                     combo[#combo+1]=item;status.Text="Combo: "..#combo.." / 3 · "..item.name

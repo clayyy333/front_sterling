@@ -52,6 +52,7 @@ Color3 = {fromRGB = function(...)
 end}
 TweenInfo={new=function(...)return {...}end}
 Enum = {
+    TextTruncate={AtEnd=1},
     ApplyStrokeMode={Border=1},
     EasingStyle={Linear=1,Sine=2},EasingDirection={InOut=1},
     KeyCode = {W=1,S=2,A=3,D=4,Space=5,LeftControl=6,C=7,LeftShift=8},
@@ -279,6 +280,9 @@ local expectedColumns=math.max(1,math.floor(catalogWidth/(targetWidth+spacing)))
 assert(math.abs(cardLayout.CellSize.X.Offset-(catalogWidth-spacing*(expectedColumns-1))/expectedColumns)<.01,'cards use the original GUI width calculation')
 
 local tiles={};for _,child in ipairs(grid:GetChildren())do if child.ClassName=='Frame'then tiles[#tiles+1]=child end end
+local title=tiles[1]:FindFirstChild('Play'):FindFirstChild('ItemName')
+assert(title.TextTruncate==Enum.TextTruncate.AtEnd and title.ClipsDescendants,'long card names remain within their two-line area')
+assert(tiles[1]:FindFirstChild('Favorite').Size.Y.Offset==22,'favorite has an independent inset touch area')
 find(tiles[1],'Play').Activated:Fire()
 textButton(app.Window.Gui,'Caminar',true).Activated:Fire()
 find(tiles[2],'Play').Activated:Fire()
