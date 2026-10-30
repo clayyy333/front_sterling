@@ -30,11 +30,11 @@ return function(app)
         ui:Create("UIGradient",{Transparency=wordmarkFade},shade)
     end
     local wordmarkShadow=ui:Label(header,app.Config.Name,25)
-    wordmarkShadow.Name="WordmarkShadow";wordmarkShadow.Font=Enum.Font.Garamond
+    wordmarkShadow.Name="WordmarkShadow";wordmarkShadow.Font=Enum.Font.Bodoni
     wordmarkShadow.TextColor3=Color3.fromRGB(0,0,0);wordmarkShadow.TextTransparency=.18
     wordmarkShadow.Position=UDim2.fromOffset(21,12);wordmarkShadow.Size=UDim2.new(1,-132,0,32)
     local name=ui:Label(header,app.Config.Name,25)
-    name.Name="Wordmark";name.Font=Enum.Font.Garamond
+    name.Name="Wordmark";name.Font=Enum.Font.Bodoni
     name.TextColor3=Color3.fromRGB(255,238,246)
     name.TextStrokeColor3=Color3.fromRGB(23,10,20);name.TextStrokeTransparency=.55
     name.Position=UDim2.fromOffset(20,10);name.Size=UDim2.new(1,-132,0,32)

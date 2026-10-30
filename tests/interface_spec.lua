@@ -49,7 +49,7 @@ TweenInfo={new=function(...)return {...}end}
 Enum = {
     EasingStyle={Linear=1,Sine=2},EasingDirection={InOut=1},
     KeyCode = {W=1,S=2,A=3,D=4,Space=5,LeftControl=6,C=7,LeftShift=8},
-    Font = {Gotham = 1, GothamBold = 2, GothamMedium = 3, Garamond=4},
+    Font = {Gotham = 1, GothamBold = 2, GothamMedium = 3, Garamond=4,Bodoni=5},
     ScaleType={Crop=1}, TextXAlignment = {Left = 1,Right=2}, TextYAlignment = {Top = 1},
     AutomaticSize = {X = 1, Y = 2}, SortOrder = {LayoutOrder = 1},
     ZIndexBehavior = {Sibling = 1}, ScrollingDirection = {X = 1, Y = 2},
