@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+*.log
+sterling_preferences_v1.json
+SterlingMovements_Data_*.json

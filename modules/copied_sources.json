@@ -1,0 +1,262 @@
+[
+  {
+    "source": "modules/player/anchor.lua",
+    "copy": "modules/player/anchor.lua",
+    "sha256": "dfc4bfd9b986950b298ed1ca76276a00697e53df01635c25ba88511e1fe3c1dd"
+  },
+  {
+    "source": "modules/player/anchor_force_return.lua",
+    "copy": "modules/player/anchor_force_return.lua",
+    "sha256": "b100db28232392374b2811eeb14e7c97780fbd39cd1e70f13591bd536822a14f"
+  },
+  {
+    "source": "modules/player/fling2_efficient.lua",
+    "copy": "modules/player/fling2_efficient.lua",
+    "sha256": "5a6c5e606798931ca3219f102d60bb14a48b952b2d6381a1ed93739a48e0d66a"
+  },
+  {
+    "source": "modules/player/fling2_auto.lua",
+    "copy": "modules/player/fling2_auto.lua",
+    "sha256": "f6ebfc6e9e11f83f0adf8f5472b102c46bfc51f4a0d710e859132cc8d99fa7f6"
+  },
+  {
+    "source": "modules/player/fling_return_guard.lua",
+    "copy": "modules/player/fling_return_guard.lua",
+    "sha256": "7fb09eec08a23fc2df12b0e8001b8e57f5e39bed40ef49b96e5af8e4e8cda554"
+  },
+  {
+    "source": "modules/player/contact_fling.lua",
+    "copy": "modules/player/contact_fling.lua",
+    "sha256": "660f92fc36b31df9f664c4fd8fe3d4fe3a231be3b21d12e971622b6a5eae946d"
+  },
+  {
+    "source": "modules/player/contact_fling_adjustable.lua",
+    "copy": "modules/player/contact_fling_adjustable.lua",
+    "sha256": "aec9a0e0642a95ddb62f92d84070807fa4880ce0885196d4161a56c7487219c0"
+  },
+  {
+    "source": "modules/player/xeno_fling_replication_assist.lua",
+    "copy": "modules/player/xeno_fling_replication_assist.lua",
+    "sha256": "b29ed584a9fa87aa6da60147d84571f79e320a7d956072f5917574ff2572b31e"
+  },
+  {
+    "source": "modules/player/fling_car2_delta.lua",
+    "copy": "modules/player/fling_car2_delta.lua",
+    "sha256": "a3d85e9ded00e7c879ca4d3fd5ce13f94a7b9812d87ed5db1c3c2f2d907ea88a"
+  },
+  {
+    "source": "modules/player/fling_car2_xeno.lua",
+    "copy": "modules/player/fling_car2_xeno.lua",
+    "sha256": "36a88ed4699ab496025130aa1430ad65ef00bbaf30ae355680abd37fe0de4e0e"
+  },
+  {
+    "source": "modules/player/static_noclip_anchor.lua",
+    "copy": "modules/player/static_noclip_anchor.lua",
+    "sha256": "e3a9945e40ffbbb2af33e8545a3400aa43a2081c12afcc1ed7a4f51d2b1d469e"
+  },
+  {
+    "source": "modules/player/mobile_fall_guard.lua",
+    "copy": "modules/player/mobile_fall_guard.lua",
+    "sha256": "8049fa511002ee24589bfb818c8bf5e990778ed2ba2fc00ebc4d670316385cf7"
+  },
+  {
+    "source": "modules/player/mobile_anchor_v13.lua",
+    "copy": "modules/player/mobile_anchor_v13.lua",
+    "sha256": "bc6e64f8ceaee869db55365b9778df9cef3b7a337467edc2bdb14cafe1e7bff1"
+  },
+  {
+    "source": "modules/player/spectator_camera.lua",
+    "copy": "modules/player/spectator_camera.lua",
+    "sha256": "d97dd48a7c9ff501a15f6e03b7a2c1147c0fdf2237ef23c1041957163d8efffb"
+  },
+  {
+    "source": "modules/player/flight_control.lua",
+    "copy": "modules/player/flight_control.lua",
+    "sha256": "660258459ef0db26c3950315736755a4bbfcc599d10b67f22460ff681149c9ee"
+  },
+  {
+    "source": "modules/player/movement_control.lua",
+    "copy": "modules/player/movement_control.lua",
+    "sha256": "6340fdc23950ef5b7b4c49e6ee84e1afc2e4b302b62ddeffed3c79b9514637bb"
+  },
+  {
+    "source": "modules/player/catalogs.lua",
+    "copy": "modules/movements/player/catalogs.lua",
+    "sha256": "d5f24c8b3b3376fd2bd4f439cab14e6559d5b97e13e18a634bd1ab4eb22193de"
+  },
+  {
+    "source": "modules/player/animation_packs.lua",
+    "copy": "modules/movements/player/animation_packs.lua",
+    "sha256": "e2be0aadc7c167ac02170e699711f8fc090269d63ce0c2825d230cb10ade82b1"
+  },
+  {
+    "source": "modules/player/emotes.lua",
+    "copy": "modules/movements/player/emotes.lua",
+    "sha256": "c37d1c4b443e5843beecb6474e32c2b777db49102ec5ba68a60558e77850557c"
+  },
+  {
+    "source": "modules/player/combos.lua",
+    "copy": "modules/movements/player/combos.lua",
+    "sha256": "dd6284301235b19d9e6db2f28f683e9db9c26685f547c4761fbc5741c5aa976e"
+  },
+  {
+    "source": "modules/player/friend_follow.lua",
+    "copy": "modules/movements/player/friend_follow.lua",
+    "sha256": "5c0a6a550630ba90b058e1905c7d2c71377fc42db7140ae764acd5eb954bdad9"
+  },
+  {
+    "source": "modules/player/hud_integration.lua",
+    "copy": "modules/movements/player/hud_integration.lua",
+    "sha256": "45510af0f56d90be86ef6d3fed83780f363deef8ce3f3d021beaa8215122c329"
+  },
+  {
+    "source": "modules/core/storage.lua",
+    "copy": "modules/movements/core/storage.lua",
+    "sha256": "433ddb9396a6291505105dfa88e6f5e8e35ac5b7fa6b345892fb41b480d55f41"
+  },
+  {
+    "source": "modules/core/favorites.lua",
+    "copy": "modules/movements/core/favorites.lua",
+    "sha256": "ed63bf6058ef8d3b6a6a08cf8a900050b5ebced4204d349a396041d3326a6154"
+  },
+  {
+    "source": "modules/core/utilities.lua",
+    "copy": "modules/movements/core/utilities.lua",
+    "sha256": "3a53f049aa19e5768638d47504c0a4656360187e995c85fd4dd4a4743d57aa71"
+  },
+  {
+    "source": "modules/core/load_state.lua",
+    "copy": "modules/movements/core/load_state.lua",
+    "sha256": "afbb14affbccd4890533b234880a996482ac60eabb225ef1c79e11e874cbe20e"
+  },
+  {
+    "source": "modules/ui/translations.lua",
+    "copy": "modules/movements/ui/translations.lua",
+    "sha256": "3b6ec54320c15ec2a94b17776ba771c79f28a5efae77fcc77ebba1eff24b0bec"
+  },
+  {
+    "source": "modules/ui/search.lua",
+    "copy": "modules/movements/ui/search.lua",
+    "sha256": "193e2b9d25103d40b36b96c49a02ca6eda2ebe7d0e1b2225b2a5dbda3d658b98"
+  },
+  {
+    "source": "modules/ui/settings.lua",
+    "copy": "modules/movements/ui/settings.lua",
+    "sha256": "80ae76f36391b92e045de3dee2ab1dc6f8c45f789bb094570c6f94caff47c63a"
+  },
+  {
+    "source": "modules/ui/keybinds.lua",
+    "copy": "modules/movements/ui/keybinds.lua",
+    "sha256": "8169573566c366b70f4ae76761fed3416caf4d60e9c5f19d837b0d08e70af02a"
+  },
+  {
+    "source": "modules/ui/cards.lua",
+    "copy": "modules/movements/ui/cards.lua",
+    "sha256": "6bba4094bb7debc9970c7bf8651d80e3d10f1d9b5492eb3cfe148617051f21f8"
+  },
+  {
+    "source": "modules/ui/tabs.lua",
+    "copy": "modules/movements/ui/tabs.lua",
+    "sha256": "2ca12593513a5565cacb9155c168f1516e624b07f1cbcc3b777e07ad1e40d21c"
+  },
+  {
+    "source": "modules/ui/grid_layout.lua",
+    "copy": "modules/movements/ui/grid_layout.lua",
+    "sha256": "9f38f5ad9bd1568afb1f585f8352f099a72f24eba03099f147e8375884472cdc"
+  },
+  {
+    "source": "modules/ui/toolbar.lua",
+    "copy": "modules/movements/ui/toolbar.lua",
+    "sha256": "6f15a3975b89baaae843f77345938a595767752d7f1b20f9bc9a7628fcc7878e"
+  },
+  {
+    "source": "modules/ui/hud.lua",
+    "copy": "modules/movements/ui/hud.lua",
+    "sha256": "e549b7e7f008e2e418773da886f50e10636c389c4e7c35731bfb55100f497d5f"
+  },
+  {
+    "source": "modules/ui/hud_tracking.lua",
+    "copy": "modules/movements/ui/hud_tracking.lua",
+    "sha256": "90a5c94c9279cd910cced2541312ba1217090507d81751a66148d190bdf8ecdc"
+  },
+  {
+    "source": "modules/ui/combo_queue.lua",
+    "copy": "modules/movements/ui/combo_queue.lua",
+    "sha256": "955e13cd67ac3ed75500a326515abbe9ec657a3b5e6b111f872caf256ae1574b"
+  },
+  {
+    "source": "modules/ui/friend_follow.lua",
+    "copy": "modules/movements/ui/friend_follow.lua",
+    "sha256": "0384fb3df15fa61f0df66cad42eb1eca643c49d4ef46c76189b4ba117903254a"
+  },
+  {
+    "source": "modules/data/emotes.lua",
+    "copy": "modules/movements/data/emotes.lua",
+    "sha256": "f793eb5a72e3fcbe247a2c9c954e1663a1527a135848d6475924f921ed0c6106"
+  },
+  {
+    "source": "modules/data/animations.lua",
+    "copy": "modules/movements/data/animations.lua",
+    "sha256": "5f02472363a32688500faa86b612b3e7558480e7bd9004fbbdb640d66f3b46ec"
+  },
+  {
+    "source": "modules/player/ambient_sound.lua",
+    "copy": "modules/movements/player/ambient_sound.lua",
+    "sha256": "539f70004ef36fb2415a7fb42abfad1513d14108a53940eb8d391ec41102ba69"
+  },
+  {
+    "source": "modules/player/anti_afk.lua",
+    "copy": "modules/movements/player/anti_afk.lua",
+    "sha256": "708a63ba1c49bc5b99a9a4b3f92ba6786ced99b3b65d88c949032b500206ebf2"
+  },
+  {
+    "source": "modules/player/rejoin.lua",
+    "copy": "modules/movements/player/rejoin.lua",
+    "sha256": "a0d4b3d702a890a1e96ab4bd10f9517b5cb660e0e7f1d6b11c41292d1203f09d"
+  },
+  {
+    "source": "modules/player/emergency_anchor.lua",
+    "copy": "modules/movements/player/emergency_anchor.lua",
+    "sha256": "1d55930ce479fdb43800100328374f7b1848687e42a2dd6bd9c24e9ca36b4866"
+  },
+  {
+    "source": "modules/player/user_shortcut.lua",
+    "copy": "modules/movements/player/user_shortcut.lua",
+    "sha256": "882d7758770a61ba4206443190c1ee8d2e35f8b74869bafc1e348b875bf04bd5"
+  },
+  {
+    "source": "modules/ui/user_shortcut.lua",
+    "copy": "modules/movements/ui/user_shortcut.lua",
+    "sha256": "814f677980b374ead6995cad90526e976bd7abeb7a4499a4395a1493fd3da7fb"
+  },
+  {
+    "source": "modules/ui/emergency_anchor_alert.lua",
+    "copy": "modules/movements/ui/emergency_anchor_alert.lua",
+    "sha256": "a5dec5793d077169b36a9643a7d29939682fec543233002416aeae221e9ae5d6"
+  },
+  {
+    "source": "modules/ui/themes.lua",
+    "copy": "modules/movements/ui/themes.lua",
+    "sha256": "741976682ddff1a6ff316fe624eea85e3e9b20357211bf138ddff30901d3382c"
+  },
+  {
+    "source": "modules/ui/theme_application.lua",
+    "copy": "modules/movements/ui/theme_application.lua",
+    "sha256": "93992a777e59492df9a3ca9649e05b06bbde665a7f1bde7dc8f105bcc6a02e07"
+  },
+  {
+    "source": "modules/ui/notifications.lua",
+    "copy": "modules/movements/ui/notifications.lua",
+    "sha256": "275b4aa850c621c307814c4e35441be40ea250ab83c8a289cbf8dd88d0fd473e"
+  },
+  {
+    "source": "modules/ui/layout_state.lua",
+    "copy": "modules/movements/ui/layout_state.lua",
+    "sha256": "5abbecdff541a18c8dcc08322508663d756a557fc6ff509ef46a5d4d0c983f6c"
+  },
+  {
+    "source": "modules/ui/mobile_typography.lua",
+    "copy": "modules/movements/ui/mobile_typography.lua",
+    "sha256": "cd13fe1a5632e4b0d4ff157dd04414362ae11caf04cb0ffccff3931d6af50c17"
+  }
+]
