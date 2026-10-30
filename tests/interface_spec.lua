@@ -145,6 +145,9 @@ readfile = function(path)
         assert(named.Brand.Position.Y.Offset+named.Brand.Size.Y.Offset<named.Subtitle.Position.Y.Offset,'title/subtitle do not overlap')
         assert(named.Subtitle.Position.Y.Offset+named.Subtitle.Size.Y.Offset<named.LoadingCard.Size.Y.Offset-48,'names clear the loading footer')
         assert(named.OuterRim:FindFirstChildOfClass('UIGradient') and named.BrandDepth,'rim and title have depth')
+        assert(not named.LoadingShadow and named.RedHalo1 and named.RedHalo20,'solid shadow bands replaced by feathered red halo')
+        assert(named.RedHalo1.BackgroundTransparency==1 and named.RedHalo20.BackgroundTransparency==1,'halo must never paint solid rectangles')
+        assert(named.RedHalo1:FindFirstChild('Feather').Transparency<named.RedHalo20:FindFirstChild('Feather').Transparency,'glow fades outward')
     end
     assert(sources[relative], "not found: " .. path)
     return sources[relative]

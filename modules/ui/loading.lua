@@ -15,24 +15,30 @@ return function(environment)
         DisplayOrder=1000,ZIndexBehavior=Enum.ZIndexBehavior.Sibling},parent)
     local overlay=create("Frame",{Size=UDim2.fromScale(1,1),BorderSizePixel=0,
         BackgroundColor3=Color3.fromRGB(8,8,12),BackgroundTransparency=.25},gui)
-    local shadows={}
-    for _,layer in ipairs({{40,.96},{24,.92},{12,.85}})do
-        shadows[#shadows+1]=round(create("Frame",{Name="LoadingShadow",AnchorPoint=Vector2.new(.5,.5),
-            Position=UDim2.new(.5,0,.5,7),BackgroundColor3=Color3.fromRGB(0,0,0),
-            BackgroundTransparency=layer[2],BorderSizePixel=0,ZIndex=1},overlay),18+layer[1]/2)
+    -- Feathered outline: transparent centers, no stacked solid rectangles.
+    -- Small overlapping rings approximate a Gaussian red glow without textures.
+    local halo={}
+    for index=20,1,-1 do
+        local distance=index*.8
+        local opacity=.42*math.exp(-((distance/6.5)^2))
+        local frame=round(create("Frame",{Name="RedHalo"..index,AnchorPoint=Vector2.new(.5,.5),
+            Position=UDim2.fromScale(.5,.5),BackgroundTransparency=1,BorderSizePixel=0,ZIndex=1},overlay),18+distance)
+        create("UIStroke",{Name="Feather",Color=Color3.fromRGB(222,27,64),
+            Thickness=2,Transparency=1-opacity},frame)
+        halo[#halo+1]={Frame=frame,Spread=distance*2}
     end
     local card=round(create("Frame",{Name="LoadingCard",ZIndex=2,AnchorPoint=Vector2.new(.5,.5),
         Position=UDim2.fromScale(.5,.5),BorderSizePixel=0,ClipsDescendants=true,
         BackgroundColor3=Color3.fromRGB(20,16,23)},overlay),18)
-    local rim=create("UIStroke",{Name="OuterRim",Color=Color3.fromRGB(255,255,255),Thickness=1.2,Transparency=.35},card)
+    local rim=create("UIStroke",{Name="OuterRim",Color=Color3.fromRGB(255,255,255),Thickness=1.3,Transparency=.18},card)
     create("UIGradient",{Rotation=35,Color=ColorSequence.new({
-        ColorSequenceKeypoint.new(0,Color3.fromRGB(235,201,194)),
-        ColorSequenceKeypoint.new(.35,Color3.fromRGB(149,89,112)),
-        ColorSequenceKeypoint.new(.7,Color3.fromRGB(58,44,61)),
-        ColorSequenceKeypoint.new(1,Color3.fromRGB(209,165,168))})},rim)
+        ColorSequenceKeypoint.new(0,Color3.fromRGB(255,87,115)),
+        ColorSequenceKeypoint.new(.35,Color3.fromRGB(210,28,68)),
+        ColorSequenceKeypoint.new(.7,Color3.fromRGB(124,17,45)),
+        ColorSequenceKeypoint.new(1,Color3.fromRGB(235,51,90))})},rim)
     local inner=round(create("Frame",{Name="InnerRim",BackgroundTransparency=1,BorderSizePixel=0,
         Position=UDim2.fromOffset(2,2),Size=UDim2.new(1,-4,1,-4),ZIndex=7},card),16)
-    create("UIStroke",{Color=Color3.fromRGB(255,235,241),Thickness=1,Transparency=.9},inner)
+    create("UIStroke",{Color=Color3.fromRGB(247,131,151),Thickness=1,Transparency=.78},inner)
     local image=tostring((environment.SterlingSource or {}).IntroImage or "125472021271676")
     if image:match("^%d+$")then image="rbxassetid://"..image end
     round(create("ImageLabel",{Name="PresentationImage",Image=image,BackgroundTransparency=1,
@@ -82,9 +88,8 @@ return function(environment)
         local width=math.min(780,view.X*.88,view.Y*.8*16/9)
         card.Size=UDim2.fromOffset(width,math.min(math.max(width*9/16,220),view.Y*.8))
         local height=card.Size.Y.Offset
-        for index,shadowLayer in ipairs(shadows)do
-            local spread=({40,24,12})[index]
-            shadowLayer.Size=UDim2.fromOffset(width+spread,height+spread)
+        for _,layer in ipairs(halo)do
+            layer.Frame.Size=UDim2.fromOffset(width+layer.Spread,height+layer.Spread)
         end
         local size=math.clamp(math.floor(width*.058),24,44)
         title.TextSize=size;shadow.TextSize=size;depth.TextSize=size
