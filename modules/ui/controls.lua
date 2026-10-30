@@ -194,6 +194,8 @@ return function(app)
         local function show(id)
             if active then active:Destroy() end
             for _, child in ipairs(body:GetChildren()) do child:Destroy() end
+            body.ScrollingEnabled=true;body.AutomaticCanvasSize=Enum.AutomaticSize.Y
+            body.CanvasPosition=Vector2.new(0,0)
             active=ui:Scope()
             for key, button in pairs(buttons) do
                 button.BackgroundColor3=key==id and theme.Selected or theme.Raised

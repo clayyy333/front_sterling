@@ -268,7 +268,7 @@ textButton(app.Window.Gui,'Caminar').Activated:Fire()
 find(tiles[2],'Play').Activated:Fire()
 textButton(app.Window.Gui,'Correr').Activated:Fire()
 assert(fake.Settings.animationPackSelection.Walk.name=='Alpha'and fake.Settings.animationPackSelection.Run.name=='Beta','picker mixes states from different packs')
-textButton(catalog,'Guardar mezcla').Activated:Fire()
+textButton(catalog,'Guardar animaciones puestas').Activated:Fire()
 assert(#savedMixes==1 and savedMixes[1].selection.Walk.name=='Alpha'and savedMixes[1].selection.Run.name=='Beta','save keeps the mixed states')
 textButton(catalog,'Guardadas').Activated:Fire()
 textButton(app.Window.Gui,'Aplicar · ').Activated:Fire()
@@ -278,6 +278,23 @@ textButton(app.Window.Gui,'Eliminar · ').Activated:Fire()
 assert(#savedMixes==0,'saved mix can be removed')
 for _,child in ipairs(catalog:GetDescendants())do assert(child.Text~='Reproducir combo'and child.Text~='Vaciar combo','animation tab cannot show emote combo actions')end
 textButton(find(app.Window.Gui,'AnimationPicker'),'×').Activated:Fire()
+for index=3,30 do fake.AnimationPacks[index]={id='anim_'..index,bundleId=index,name='Pack '..index,isAnimationPack=true}end
+textButton(catalog,'Emotes').Activated:Fire();textButton(catalog,'Animaciones').Activated:Fire()
+local function firstPackName()
+    for _,child in ipairs(find(catalog,'Play'):GetChildren())do if child.ClassName=='TextLabel'then return child.Text end end
+end
+local firstPack=firstPackName()
+local catalogViewport=find(catalog,'CatalogViewport')
+assert(catalogViewport and catalogViewport.AbsoluteSize.Y>=142,'compact toolbar leaves a whole pack row visible')
+catalogViewport.CanvasPosition=Vector2.new(0,100)
+find(catalog,'NextPage').Activated:Fire()
+assert(firstPackName()~=firstPack and find(catalog,'PageNumber').Text:sub(1,1)=='2','next arrow shows a different page of packs')
+assert(catalogViewport.CanvasPosition.Y==0,'page changes reset only catalog scrolling')
+find(catalog,'PreviousPage').Activated:Fire();assert(firstPackName()==firstPack,'previous arrow restores prior pack page')
+for _,child in ipairs(catalog:GetDescendants())do assert(child.Text~='Mi mezcla','only save and saved-animation buttons are retained')end
+find(catalog,'Play').Activated:Fire();assert(textButton(app.Window.Gui,'Inactividad'),'original Idle label restored')
+textButton(find(app.Window.Gui,'AnimationPicker'),'×').Activated:Fire()
+
 assert(find(app.Window.Gui,'Wordmark')and not find(app.Window.Gui,'Monogram'),'header uses styled name')
 assert(app.Navigation.Buttons.movimientos.TextColor3==app.Theme.AccentText,'selected button text uses warm white')
 movement.EnsureLoaded,movement.Context=oldEnsure,oldContext

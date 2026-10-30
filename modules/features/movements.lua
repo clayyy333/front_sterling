@@ -9,7 +9,7 @@ return function(app)
     local function play(c,item)
         if item.isAnimationPack then c.EquipAnimationPack(item) else c.PlayEmote(item.id,item.name) end
     end
-    app.Features:Register({Id="movimientos",Label="Movimientos",Title="Movimientos",Subtitle="Encuentra tu próximo movimiento.",
+    app.Features:Register({Id="movimientos",Label="Movimientos",Title="Movimientos",Subtitle="",
         Mount=function(_,parent)
             ui:Workspace(parent,tabs,function(id,body,scope)
                 local waitLabel=ui:Note(body,"Preparando tu catálogo…")
@@ -53,29 +53,36 @@ return function(app)
                         end
                         return
                     end
-                    local tools=ui:Create("Frame",{Size=UDim2.new(1,0,0,36),BackgroundTransparency=1,LayoutOrder=-10},content)
+                    -- Keep search, paging and saved controls outside the catalog scroll.
+                    content:Destroy()
+                    body.ScrollingEnabled=false;body.AutomaticCanvasSize=Enum.AutomaticSize.None
+                    body.CanvasPosition=Vector2.new(0,0)
+                    content=ui:Create("Frame",{Name="CatalogLayout",Size=UDim2.fromScale(1,1),BackgroundTransparency=1},body)
+                    status=ui:Status(content,scope)
+                    status.Position=UDim2.new(0,0,1,-20);status.Size=UDim2.new(1,-4,0,20);status.TextSize=11
+                    local tools=ui:Create("Frame",{Size=UDim2.new(1,-4,0,32),BackgroundTransparency=1},content)
                     local search=ui:Round(ui:Create("TextBox",{Name="CatalogSearch",Active=true,Selectable=true,Size=UDim2.new(1,-142,1,0),Text="",PlaceholderText="Buscar por nombre o ID…",ClearTextOnFocus=false,
                         Font=Enum.Font.Gotham,TextSize=12,TextColor3=theme.Text,BackgroundColor3=theme.Raised,BorderSizePixel=0},tools),8)
                     ui:Create("UIPadding",{PaddingLeft=UDim.new(0,12),PaddingRight=UDim.new(0,10)},search)
-                    local previous=ui:Button(tools,"‹");previous.Position=UDim2.new(1,-134,0,0);previous.Size=UDim2.fromOffset(30,36)
-                    local pageText=ui:Label(tools,"1 / 1",11);pageText.Position=UDim2.new(1,-102,0,0);pageText.Size=UDim2.fromOffset(68,36)
-                    local next=ui:Button(tools,"›");next.Position=UDim2.new(1,-30,0,0);next.Size=UDim2.fromOffset(30,36)
-                    local count=ui:Note(content,"");count.Size=UDim2.new(1,0,0,18);count.LayoutOrder=-9
+                    local previous=ui:Button(tools,"‹");previous.Name="PreviousPage";previous.Position=UDim2.new(1,-134,0,0);previous.Size=UDim2.fromOffset(30,32)
+                    local pageText=ui:Label(tools,"1 / 1",11);pageText.Name="PageNumber";pageText.Position=UDim2.new(1,-102,0,0);pageText.Size=UDim2.fromOffset(68,32)
+                    local next=ui:Button(tools,"›");next.Name="NextPage";next.Position=UDim2.new(1,-30,0,0);next.Size=UDim2.fromOffset(30,32)
                     local animationPicker=ui:AnimationPicker(scope,c,status)
                     if id=="animations"then
-                        local actions=ui:Create("Frame",{Name="AnimationTools",Size=UDim2.new(1,0,0,36),BackgroundTransparency=1,LayoutOrder=-8},content)
-                        for index,entry in ipairs({{"Mi mezcla",function()animationPicker:OpenCurrent()end},
-                            {"Guardar mezcla",function()animationPicker:Save()end},
-                            {"Guardadas",function()animationPicker:OpenSaved()end}})do
-                            local button=ui:Action(actions,scope,entry[1],entry[2])
-                            button.Size=UDim2.new(1/3,-6,1,0);button.Position=UDim2.new((index-1)/3,0,0,0);button.TextSize=11
-                        end
-                        local hint=ui:Note(content,"Toca un paquete para equiparlo completo o elegir qué parte mezclar.")
-                        hint.LayoutOrder=-7;hint.Size=UDim2.new(1,0,0,30)
+                        local actions=ui:Create("Frame",{Name="AnimationTools",Size=UDim2.new(1,-4,0,30),Position=UDim2.fromOffset(0,40),BackgroundTransparency=1},content)
+                        local save=ui:Action(actions,scope,"Guardar animaciones puestas",function()animationPicker:Save()end)
+                        save.Size=UDim2.new(.68,-6,1,0);save.TextSize=11
+                        local saved=ui:Action(actions,scope,"Guardadas",function()animationPicker:OpenSaved()end)
+                        saved.Position=UDim2.fromScale(.68,0);saved.Size=UDim2.new(.32,0,1,0);saved.TextSize=11
                     end
-                    local grid=ui:Create("Frame",{Name="CatalogGrid",Size=UDim2.new(1,0,0,0),BackgroundTransparency=1,LayoutOrder=-6},content)
+                    local gridTop=id=="animations"and 78 or 40
+                    local footer=id=="animations"and 24 or 62
+                    local viewport=ui:Create("ScrollingFrame",{Name="CatalogViewport",Position=UDim2.fromOffset(0,gridTop),
+                        Size=UDim2.new(1,0,1,-gridTop-footer),BackgroundTransparency=1,BorderSizePixel=0,
+                        ScrollBarThickness=3,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},content)
+                    local grid=ui:Create("Frame",{Name="CatalogGrid",Size=UDim2.new(1,-6,0,0),BackgroundTransparency=1},viewport)
                     local layout=ui:Create("UIGridLayout",{CellPadding=UDim2.fromOffset(8,8),SortOrder=Enum.SortOrder.LayoutOrder},grid)
-                    local items,page,version={},1,0
+                    local items,page,version,maxPages={},1,0,1
                     local cardsScope
                     scope.Cleanups[#scope.Cleanups+1]=function()if cardsScope then cardsScope:Destroy()end end
                     local function draw()
@@ -83,21 +90,29 @@ return function(app)
                         if cardsScope then cardsScope:Destroy()end;cardsScope=ui:Scope();cardsScope.OnError=scope.OnError
                         for _,child in ipairs(grid:GetChildren()) do if child:IsA("GuiObject") then child:Destroy()end end
                         local columns=math.clamp(math.floor(math.max(180,body.AbsoluteSize.X)/112),2,6)
-                        local perPage=columns*3
-                        local pages=math.max(1,math.ceil(#items/perPage));page=math.clamp(page,1,pages)
-                        pageText.Text=page.." / "..pages;count.Text=#items.." resultados"
-                        layout.CellSize=UDim2.new(1/columns,-8,0,142)
+                        local available=math.max(100,viewport.AbsoluteSize.Y)
+                        local cardHeight=available>=240 and math.min(142,math.floor(available/2)-8)or 142
+                        local rowHeight=cardHeight+8
+                        local rows=math.clamp(math.floor((available+8)/rowHeight),1,3)
+                        local perPage=columns*rows
+                        maxPages=math.max(1,math.ceil(#items/perPage));page=math.clamp(page,1,maxPages)
+                        pageText.Text=page.." / "..maxPages;status.Text=#items.." resultados"
+                        previous.TextColor3=page>1 and theme.Text or theme.Muted
+                        next.TextColor3=page<maxPages and theme.Text or theme.Muted
+                        layout.CellSize=UDim2.new(1/columns,-8,0,cardHeight)
                         local first=(page-1)*perPage+1
                         local visible=math.min(perPage,#items-first+1)
-                        grid.Size=UDim2.new(1,0,0,math.ceil(math.max(0,visible)/columns)*150)
+                        grid.Size=UDim2.new(1,-6,0,math.ceil(math.max(0,visible)/columns)*rowHeight)
+                        viewport.CanvasPosition=Vector2.new(0,0)
+                        local imageHeight=cardHeight-66
                         for index=first,math.min(#items,first+perPage-1) do
                             local item=items[index]
                             local tile=ui:Round(ui:Create("Frame",{Name="CatalogItem",BackgroundColor3=theme.Surface,BorderSizePixel=0,LayoutOrder=index},grid),10)
                             ui:Create("UIStroke",{Color=theme.Line,Transparency=.45,Thickness=1},tile)
                             local button=ui:Create("TextButton",{Name="Play",Active=true,Text="",Size=UDim2.new(1,0,1,-28),BackgroundTransparency=1},tile)
-                            ui:Create("ImageLabel",{Size=UDim2.new(1,-18,0,76),Position=UDim2.fromOffset(9,6),BackgroundTransparency=1,
+                            ui:Create("ImageLabel",{Size=UDim2.new(1,-18,0,imageHeight),Position=UDim2.fromOffset(9,6),BackgroundTransparency=1,
                                 Image="rbxthumb://type="..(item.isAnimationPack and "BundleThumbnail" or "Asset").."&id="..tostring(item.bundleId or item.id).."&w=150&h=150"},button)
-                            local name=ui:Label(button,item.name,11);name.Position=UDim2.fromOffset(7,84);name.Size=UDim2.new(1,-14,0,28)
+                            local name=ui:Label(button,item.name,11);name.Position=UDim2.fromOffset(7,imageHeight+10);name.Size=UDim2.new(1,-14,0,28)
                             cardsScope:Connect(button.Activated,function()
                                 if item.isAnimationPack then animationPicker:OpenPack(item)else play(c,item)end
                                 status.Text=item.name
@@ -139,18 +154,23 @@ return function(app)
                         end)
                     end
                     scope:Connect(search:GetPropertyChangedSignal("Text"),filter)
-                    scope:Connect(previous.Activated,function()page=math.max(1,page-1);draw()end)
-                    scope:Connect(next.Activated,function()page=page+1;draw()end)
+                    scope:Connect(previous.Activated,function()if page>1 then page=page-1;draw()end end)
+                    scope:Connect(next.Activated,function()if page<maxPages then page=page+1;draw()end end)
                     scope:Connect(body:GetPropertyChangedSignal("AbsoluteSize"),draw)
-                    if id=="emotes"then
-                        ui:Action(content,scope,"Reproducir combo",function()
-                            if #combo==0 then status.Text="Añade hasta 3 emotes con + combo.";return end
-                            c.StartCombo(combo);status.Text="Combo en reproducción."
-                        end,true)
-                        ui:Action(content,scope,"Vaciar combo",function()combo={};status.Text="Combo vacío."end)
-                    end
                     if id~="animations"then
-                        ui:Action(content,scope,"Detener",function()stop(c);status.Text="Reproducción detenida."end)
+                        local footer=ui:Create("Frame",{Position=UDim2.new(0,0,1,-56),Size=UDim2.new(1,-4,0,30),BackgroundTransparency=1},content)
+                        if id=="emotes"then
+                            local run=ui:Action(footer,scope,"Reproducir combo",function()
+                                if #combo==0 then status.Text="Añade hasta 3 emotes con + combo.";return end
+                                c.StartCombo(combo);status.Text="Combo en reproducción."
+                            end,true)
+                            run.Size=UDim2.new(.42,-6,1,0);run.TextSize=11
+                            local clear=ui:Action(footer,scope,"Vaciar combo",function()combo={};status.Text="Combo vacío."end)
+                            clear.Position=UDim2.fromScale(.42,0);clear.Size=UDim2.new(.36,-6,1,0);clear.TextSize=11
+                        end
+                        local halt=ui:Action(footer,scope,"Detener",function()stop(c);status.Text="Reproducción detenida."end)
+                        halt.Position=UDim2.fromScale(id=="emotes"and .78 or 0,0)
+                        halt.Size=UDim2.new(id=="emotes"and .22 or 1,0,1,0);halt.TextSize=11
                     end
                     filter()
                 end)

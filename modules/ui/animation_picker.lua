@@ -3,7 +3,7 @@ return function(app)
     function app.UI:AnimationPicker(owner,context,status)
         local ui,theme=self,app.Theme
         local modal,scope
-        local states={{"Idle","Reposo"},{"Walk","Caminar"},{"Run","Correr"},{"Jump","Saltar"},
+        local states={{"Idle","Inactividad"},{"Walk","Caminar"},{"Run","Correr"},{"Jump","Saltar"},
             {"Fall","Caer"},{"Climb","Trepar"},{"Swim","Nadar"}}
         local function close()
             if scope then scope:Destroy();scope=nil end
@@ -44,21 +44,6 @@ return function(app)
                     end)
                 end
             end
-        end
-        function picker:OpenCurrent()
-            local list=open("Mi mezcla actual")
-            local selected=context.Settings.animationPackSelection or {}
-            for _,entry in ipairs(states)do
-                local current=selected[entry[1]]
-                local note=ui:Note(list,entry[2]..": "..(current and current.name or "Original"))
-                note.TextColor3=theme.Text
-            end
-            ui:Action(list,scope,"Guardar esta mezcla",function()
-                if self:Save()then close()else ui:Note(list,status.Text)end
-            end,true)
-            ui:Action(list,scope,"Restaurar animaciones originales",function()
-                context.RemoveAnimationPacks();status.Text="Animaciones restauradas.";close()
-            end)
         end
         function picker:Save()
             local ok=context.SaveAnimationCombination()

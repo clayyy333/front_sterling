@@ -87,11 +87,11 @@ return function(app)
     function controller:SetTitle(title, detail)
         local hasTitle=title~=nil and title~=""
         heading.Text=title or "";heading.Visible=hasTitle
-        subtitle.Text=detail or ""
+        subtitle.Text=detail or "";subtitle.Visible=detail~=nil and detail~=""
         subtitle.Position=UDim2.fromOffset(0,hasTitle and 30 or 0)
         subtitle.TextSize=hasTitle and 12 or 14
         subtitle.TextColor3=hasTitle and theme.Muted or theme.Text
-        local offset=hasTitle and 58 or 38
+        local offset=hasTitle and(detail and detail~=""and 58 or 38)or 38
         pages.Position=UDim2.fromOffset(0,offset);pages.Size=UDim2.new(1,0,1,-offset)
     end
     function controller:ResetSize()
