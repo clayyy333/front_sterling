@@ -2,7 +2,7 @@ return function(app)
     local ui,flows=app.UI,app.Flows.Ancla
     app.Features:Register({Id="ancla",Label="Ancla",Title="Ancla",Subtitle="Estabilidad y movimiento.",
         Mount=function(_,parent)
-            ui:Workspace(parent,{{"normal","Normal",90},{"test","Test",76},{"mobile","Muévete 1.3",112}},function(id,body,scope)
+            ui:Workspace(parent,{{"normal","Normal",90},{"test","Test",76},{"mobile","Caminar anclado",144}},function(id,body,scope)
                 local stack=ui:Stack(body)
                 local status=ui:Status(stack,scope)
                 local function isolate(except)
@@ -38,7 +38,7 @@ return function(app)
                     ui:Toggle(stack,scope,"Regreso constante",function()return flows.Test.ConstantReturn end,function(v)return flows.Test:SetConstantReturn(v)end)
                 else
                     ui:Note(stack,"Versión 1.3 · movimiento, protección de caídas y liberación de asientos.")
-                    ui:Toggle(stack,scope,"Muévete anclado 1.3",function()return flows.MueveteV13.Running end,function(v)
+                    ui:Toggle(stack,scope,"Caminar anclado",function()return flows.MueveteV13.Running end,function(v)
                         if v then isolate("mobile");return flows.MueveteV13:Start()else flows.MueveteV13:Stop();return true end
                     end)
                     ui:Action(stack,scope,"Actualizar referencia segura",function()

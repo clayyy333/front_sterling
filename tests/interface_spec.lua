@@ -217,9 +217,9 @@ local function find(parent, name)
         local nested = find(child, name);if nested then return nested end
     end
 end
-local function textButton(root,prefix)
+local function textButton(root,prefix,exact)
     for _, child in ipairs(root:GetDescendants())do
-        if child.ClassName=='TextButton'and type(child.Text)=='string'and child.Text:sub(1,#prefix)==prefix then return child end
+        if child.ClassName=='TextButton'and type(child.Text)=='string'and child.Text:sub(1,#prefix)==prefix and(not exact or child.Text==prefix)then return child end
     end
     error('missing button: '..prefix)
 end
@@ -273,7 +273,7 @@ textButton(catalog,'Animaciones').Activated:Fire()
 local grid=find(catalog,'CatalogGrid')
 local tiles={};for _,child in ipairs(grid:GetChildren())do if child.ClassName=='Frame'then tiles[#tiles+1]=child end end
 find(tiles[1],'Play').Activated:Fire()
-textButton(app.Window.Gui,'Caminar').Activated:Fire()
+textButton(app.Window.Gui,'Caminar',true).Activated:Fire()
 find(tiles[2],'Play').Activated:Fire()
 textButton(app.Window.Gui,'Correr').Activated:Fire()
 assert(fake.Settings.animationPackSelection.Walk.name=='Alpha'and fake.Settings.animationPackSelection.Run.name=='Beta','picker mixes states from different packs')
