@@ -1,7 +1,7 @@
 return function(app)
     local ui, theme, package=app.UI,app.Theme,app.Flows.Movimientos
-    local tabs={{"emotes","Emotes",84},{"animations","Animaciones",108},{"favorites","Favoritos",94},
-        {"recent","Recientes",92},{"friends","Amigos",82},{"keybinds","Atajos",76}}
+    local tabs={{"emotes","Emotes",80},{"animations","Animaciones",104},{"favorites","Favoritos",90},
+        {"recent","Recientes",88},{"friends","Amigos",78},{"keybinds","Atajos",68}}
     local combo={}
     local function stop(c)
         c.isComboActive=false;c._comboLoopEnabled=false;c.ComboQueue={};c.StopEmote(false)
@@ -75,8 +75,8 @@ return function(app)
                         local saved=ui:Action(actions,scope,"Guardadas",function()animationPicker:OpenSaved()end)
                         saved.Position=UDim2.fromScale(.68,0);saved.Size=UDim2.new(.32,0,1,0);saved.TextSize=11
                     end
-                    local gridTop=id=="animations"and 78 or 40
-                    local footer=id=="animations"and 24 or 62
+                    local gridTop=id=="animations"and 80 or 42
+                    local footer=id=="animations"and 26 or 66
                     local viewport=ui:Create("ScrollingFrame",{Name="CatalogViewport",Position=UDim2.fromOffset(0,gridTop),
                         Size=UDim2.new(1,0,1,-gridTop-footer),BackgroundTransparency=1,BorderSizePixel=0,
                         ScrollBarThickness=3,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},content)
@@ -90,8 +90,8 @@ return function(app)
                         if cardsScope then cardsScope:Destroy()end;cardsScope=ui:Scope();cardsScope.OnError=scope.OnError
                         for _,child in ipairs(grid:GetChildren()) do if child:IsA("GuiObject") then child:Destroy()end end
                         local columns=math.clamp(math.floor(math.max(180,body.AbsoluteSize.X)/112),2,6)
-                        local available=math.max(100,viewport.AbsoluteSize.Y)
-                        local cardHeight=available>=240 and math.min(142,math.floor(available/2)-8)or 142
+                        local available=math.max(1,viewport.AbsoluteSize.Y)
+                        local cardHeight=available>=240 and math.min(142,math.floor(available/2)-8)or math.clamp(available,108,142)
                         local rowHeight=cardHeight+8
                         local rows=math.clamp(math.floor((available+8)/rowHeight),1,3)
                         local perPage=columns*rows
@@ -102,7 +102,7 @@ return function(app)
                         layout.CellSize=UDim2.new(1/columns,-8,0,cardHeight)
                         local first=(page-1)*perPage+1
                         local visible=math.min(perPage,#items-first+1)
-                        grid.Size=UDim2.new(1,-6,0,math.ceil(math.max(0,visible)/columns)*rowHeight)
+                        grid.Size=UDim2.new(1,-6,0,math.max(0,math.ceil(math.max(0,visible)/columns)*rowHeight-8))
                         viewport.CanvasPosition=Vector2.new(0,0)
                         local imageHeight=cardHeight-66
                         for index=first,math.min(#items,first+perPage-1) do
@@ -156,7 +156,7 @@ return function(app)
                     scope:Connect(search:GetPropertyChangedSignal("Text"),filter)
                     scope:Connect(previous.Activated,function()if page>1 then page=page-1;draw()end end)
                     scope:Connect(next.Activated,function()if page<maxPages then page=page+1;draw()end end)
-                    scope:Connect(body:GetPropertyChangedSignal("AbsoluteSize"),draw)
+                    scope:Connect(viewport:GetPropertyChangedSignal("AbsoluteSize"),draw)
                     if id~="animations"then
                         local footer=ui:Create("Frame",{Position=UDim2.new(0,0,1,-56),Size=UDim2.new(1,-4,0,30),BackgroundTransparency=1},content)
                         if id=="emotes"then

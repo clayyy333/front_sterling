@@ -38,7 +38,7 @@ return function(app)
     local navLayout = ui:Create("UIListLayout", {Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder}, navigation)
     local body = ui:Create("Frame", {Name = "Content", BackgroundTransparency = 1}, window)
     local heading = ui:Label(body, "", 20)
-    heading.Font = Enum.Font.GothamBold;heading.Size = UDim2.new(1, 0, 0, 34)
+    heading.Font = Enum.Font.GothamBold;heading.Size = UDim2.new(1, 0, 0, 28)
     local subtitle = ui:Label(body, "", 12)
     subtitle.Position = UDim2.fromOffset(0, 30);subtitle.Size = UDim2.new(1, 0, 0, 22);subtitle.TextColor3 = theme.Muted
     local pages = ui:Create("Frame", {
@@ -70,15 +70,15 @@ return function(app)
             navigation.Position = UDim2.fromOffset(12, 6);navigation.Size = UDim2.new(1, -24, 1, -12)
             navigation.AutomaticCanvasSize = Enum.AutomaticSize.X;navigation.ScrollingDirection = Enum.ScrollingDirection.X
             navLayout.FillDirection = Enum.FillDirection.Horizontal
-            body.Position = UDim2.fromOffset(14, 106);body.Size = UDim2.new(1, -28, 1, -126)
+            body.Position = UDim2.fromOffset(14, 104);body.Size = UDim2.new(1, -28, 1, -120)
             heading.TextSize = 19
         else
             bodySurface.Position=UDim2.fromOffset(152,48);bodySurface.Size=UDim2.new(1,-152,1,-48)
             sidebar.Position = UDim2.fromOffset(0, 48);sidebar.Size = UDim2.new(0, 152, 1, -48)
-            navigation.Position = UDim2.fromOffset(12, 20);navigation.Size = UDim2.new(1, -24, 1, -40)
+            navigation.Position = UDim2.fromOffset(12, 12);navigation.Size = UDim2.new(1, -24, 1, -24)
             navigation.AutomaticCanvasSize = Enum.AutomaticSize.Y;navigation.ScrollingDirection = Enum.ScrollingDirection.Y
             navLayout.FillDirection = Enum.FillDirection.Vertical
-            body.Position = UDim2.fromOffset(174, 64);body.Size = UDim2.new(1, -194, 1, -84)
+            body.Position = UDim2.fromOffset(174, 56);body.Size = UDim2.new(1, -194, 1, -72)
             heading.TextSize = 19
         end
         if self.OnLayout then self.OnLayout(self.Compact) end
@@ -91,7 +91,7 @@ return function(app)
         subtitle.Position=UDim2.fromOffset(0,hasTitle and 30 or 0)
         subtitle.TextSize=hasTitle and 12 or 14
         subtitle.TextColor3=hasTitle and theme.Muted or theme.Text
-        local offset=hasTitle and(detail and detail~=""and 58 or 38)or 38
+        local offset=hasTitle and(detail and detail~=""and 58 or 32)or 32
         pages.Position=UDim2.fromOffset(0,offset);pages.Size=UDim2.new(1,0,1,-offset)
     end
     function controller:ResetSize()

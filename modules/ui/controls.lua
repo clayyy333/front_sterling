@@ -184,7 +184,7 @@ return function(app)
             BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=2,
             ScrollingDirection=Enum.ScrollingDirection.X,AutomaticCanvasSize=Enum.AutomaticSize.X,CanvasSize=UDim2.new()},root)
         self:Create("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,Padding=UDim.new(0,6)},strip)
-        local body=self:Create("ScrollingFrame",{Name="Panel",Position=UDim2.fromOffset(0,48),Size=UDim2.new(1,0,1,-48),
+        local body=self:Create("ScrollingFrame",{Name="Panel",Position=UDim2.fromOffset(0,44),Size=UDim2.new(1,0,1,-44),
             BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=3,
             AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},root)
         local owner=self:Scope();local active;local buttons={}
