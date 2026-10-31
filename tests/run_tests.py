@@ -31,6 +31,7 @@ def main():
     )
     lua = LuaRuntime()
     lua.execute(sources["tests/interface_spec.lua"], lua.table_from(compiled_sources))
+    LuaRuntime().execute(sources["tests/movement_restore_spec.lua"], sources["modules/adapters/movements.lua"])
     movement_lua = LuaRuntime()
     movement_lua.execute(sources["tests/movements_spec.lua"], movement_lua.table_from(compiled_sources))
     LuaRuntime().execute(sources["tests/continuous_jump_spec.lua"], sources["modules/player/continuous_jump.lua"])

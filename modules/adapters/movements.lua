@@ -94,6 +94,23 @@ return function(app)
         if not ok then dispose();return false, tostring(problem) end
         return true, self.Context
     end
+    -- Load the saved outfit without requiring a visit to Movimientos first.
+    function package:RestoreOnOpen()
+        if self.StartupRestoreConnected then return end
+        self.StartupRestoreConnected=true
+        local function restore(character)
+            task.defer(function()
+                if not app.Alive or self.Loaded or self.Loading or not character then return end
+                local humanoid=character:FindFirstChildOfClass("Humanoid")or character:WaitForChild("Humanoid",10)
+                if not humanoid or not app.Alive or app.Player.Character~=character or self.Loaded or self.Loading then return end
+                local ok,problem=self:EnsureLoaded()
+                self.StartupRestoreError=not ok and tostring(problem)or nil
+            end)
+        end
+        local added=app.Player.CharacterAdded:Connect(restore)
+        app:OnCleanup(function()added:Disconnect()end)
+        restore(app.Player.Character)
+    end
     app.Flows.Movimientos = package
     return package
 end

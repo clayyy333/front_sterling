@@ -4,5 +4,6 @@ return function(app)
         local first = app.Features.Ordered[1]
         assert(first and app.Navigation:Show(first.Id), "Sterling: no available page")
     end
+    app.Flows.Movimientos:RestoreOnOpen()
     return true
 end
