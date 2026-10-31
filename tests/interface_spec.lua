@@ -410,6 +410,27 @@ app.Window.Frame.Visible=false;app.Window.Frame:GetPropertyChangedSignal('Visibl
 assert(not lights.Visible and tweens[#tweens].Paused,'minimize pauses light animations')
 app.Window.Frame.Visible=true;app.Window.Frame:GetPropertyChangedSignal('Visible'):Fire()
 assert(lights.Visible and tweens[#tweens].Playing,'restore resumes lights')
+local launcher=find(app.Window.Gui,'Launcher')
+local minimize=textButton(app.Window.Gui,'—',true)
+minimize.Activated:Fire()
+assert(launcher.Visible and not app.Window.Frame.Visible,'minimize exposes launcher')
+local initialLauncher=launcher.Position
+local finger={UserInputType=Enum.UserInputType.Touch,Position=v(10,10)}
+launcher.InputBegan:Fire(finger)
+finger.Position=v(90,50);input.InputChanged:Fire(finger);input.InputEnded:Fire(finger)
+launcher.Activated:Fire()
+assert(launcher.Visible and not app.Window.Frame.Visible and launcher.Position.X.Offset>initialLauncher.X.Offset,'drag moves launcher without restoring window')
+local movedLauncher=launcher.Position
+local tap={UserInputType=Enum.UserInputType.Touch,Position=v(90,50)}
+launcher.InputBegan:Fire(tap);input.InputEnded:Fire(tap);launcher.Activated:Fire()
+assert(app.Window.Frame.Visible and not launcher.Visible,'new tap restores normally after drag')
+minimize.Activated:Fire();assert(launcher.Position.X.Offset==movedLauncher.X.Offset,'launcher retains moved position on minimize')
+local mouseDown={UserInputType=Enum.UserInputType.MouseButton1,Position=v(0,0)}
+launcher.InputBegan:Fire(mouseDown)
+input.InputChanged:Fire({UserInputType=Enum.UserInputType.MouseMovement,Position=v(10000,10000)})
+input.InputEnded:Fire(mouseDown);launcher.Activated:Fire()
+assert(launcher.Visible and launcher.Position.X.Offset<=app.Window.Gui.AbsoluteSize.X-44 and launcher.Position.Y.Offset<=app.Window.Gui.AbsoluteSize.Y-44,'mouse drag stays on screen and does not reopen')
+launcher.InputBegan:Fire(tap);input.InputEnded:Fire(tap);launcher.Activated:Fire()
 local grip = find(app.Window.Gui, "Resize")
 local pointer = {UserInputType = Enum.UserInputType.Touch, Position = v(0, 0)}
 local writesBeforeResize=writes

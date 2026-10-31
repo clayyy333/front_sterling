@@ -79,6 +79,15 @@ return function(app)
         local camera = workspace.CurrentCamera
         return camera and camera.ViewportSize or Vector2.new(960, 640)
     end
+    local function placeLauncher(x,y)
+        local view=gui.AbsoluteSize
+        if not view or view.X<=0 or view.Y<=0 then view=viewport()end
+        launcher.Position=UDim2.fromOffset(math.clamp(x,4,math.max(4,view.X-48)),math.clamp(y,4,math.max(4,view.Y-48)))
+    end
+    local function clampLauncher()
+        local view=gui.AbsoluteSize or viewport();local position=launcher.Position
+        placeLauncher(position.X.Scale*view.X+position.X.Offset,position.Y.Scale*view.Y+position.Y.Offset)
+    end
     function controller:Layout(w, h)
         local view = viewport()
         width = math.clamp(w, math.min(320, view.X - 24), math.max(1, view.X - 24))
@@ -102,6 +111,7 @@ return function(app)
             body.Position = UDim2.fromOffset(174, 56);body.Size = UDim2.new(1, -194, 1, -72)
             heading.TextSize = 19
         end
+        clampLauncher()
         if self.OnLayout then self.OnLayout(self.Compact) end
     end
     function controller:Center() window.Position = UDim2.fromScale(.5, .5) end
@@ -120,9 +130,15 @@ return function(app)
         app.Storage.Values.Width = width;app.Storage.Values.Height = height;app.Storage:Save()
     end
     local gesture
+    local launcherDragged=false
     local function pointer(event)
         return event.UserInputType == Enum.UserInputType.MouseButton1 or event.UserInputType == Enum.UserInputType.Touch
     end
+    app:Connect(launcher.InputBegan,function(event)
+        if not launcher.Visible or not pointer(event)then return end
+        launcherDragged=false
+        gesture={Kind="launcher",Input=event,Start=event.Position,Position=launcher.Position}
+    end)
     app:Connect(header.InputBegan, function(event)
         if not pointer(event) or event.Position.X > header.AbsolutePosition.X + header.AbsoluteSize.X - 96 then return end
         gesture = {Kind = "drag", Input = event, Start = event.Position, Position = window.Position}
@@ -133,7 +149,13 @@ return function(app)
     app:Connect(input.InputChanged, function(event)
         if not gesture or not(event == gesture.Input or event.UserInputType == Enum.UserInputType.MouseMovement) then return end
         local delta = event.Position - gesture.Start
-        if gesture.Kind == "resize" then
+        if gesture.Kind=="launcher"then
+            if math.abs(delta.X)>=5 or math.abs(delta.Y)>=5 then launcherDragged=true end
+            if launcherDragged then
+                local view=gui.AbsoluteSize or viewport();local position=gesture.Position
+                placeLauncher(position.X.Scale*view.X+position.X.Offset+delta.X,position.Y.Scale*view.Y+position.Y.Offset+delta.Y)
+            end
+        elseif gesture.Kind == "resize" then
             controller:Layout(gesture.Width + delta.X, gesture.Height + delta.Y)
         else
             local view = viewport()
@@ -150,8 +172,11 @@ return function(app)
         end
         gesture = nil
     end)
-    app:Connect(minimize.Activated, function() gesture = nil;window.Visible = false;launcher.Visible = true end)
-    app:Connect(launcher.Activated, function() window.Visible = true;launcher.Visible = false end)
+    app:Connect(minimize.Activated, function() gesture = nil;launcherDragged=false;clampLauncher();window.Visible = false;launcher.Visible = true end)
+    app:Connect(launcher.Activated, function()
+        if launcherDragged then return end
+        gesture=nil;window.Visible=true;launcher.Visible=false
+    end)
     app:Connect(close.Activated, function() app:Destroy() end)
     local cameraConnection
     local function bindCamera()
