@@ -127,7 +127,7 @@ return function(environment)
     end
     connections[#connections+1]=workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(cameraChanged)
     cameraChanged()
-    local openingTween=tweenService:Create(opening,TweenInfo.new(.8,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),{Value=1})
+    local openingTween=tweenService:Create(opening,TweenInfo.new(.6,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),{Value=1})
     borderTweens[#borderTweens+1]=openingTween;openingTween:Play()
     local lastYield=os.clock()
     function controller:Yield(force)
