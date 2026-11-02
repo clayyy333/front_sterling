@@ -258,5 +258,20 @@
     "source": "modules/ui/mobile_typography.lua",
     "copy": "modules/movements/ui/mobile_typography.lua",
     "sha256": "cd13fe1a5632e4b0d4ff157dd04414362ae11caf04cb0ffccff3931d6af50c17"
+  },
+  {
+    "source": "modules/player/auto_skate_delta.lua",
+    "copy": "modules/player/auto_skate_delta.lua",
+    "sha256": "4f50563c2e680f61d170fbce769155615224638ef952438384d61d34c6a0e658"
+  },
+  {
+    "source": "modules/player/auto_skate_xeno.lua",
+    "copy": "modules/player/auto_skate_xeno.lua",
+    "sha256": "8fc24638a6b540d6c53b8c6803c8352ce4e4804a46761bde3ea69b6b48ff9b2c"
+  },
+  {
+    "source": "modules/player/anchor_auto.lua",
+    "copy": "modules/player/anchor_auto.lua",
+    "sha256": "a78bdc8b37b6b2ffa277526614c48173eb9d79449cfbc9419f589137a8b904ce"
   }
 ]

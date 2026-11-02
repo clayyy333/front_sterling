@@ -7,7 +7,7 @@ return function(app)
         "setfenv", "getfenv", "setmetatable", "getmetatable", "rawget", "rawset",
         "math", "os", "string", "table", "coroutine", "utf8", "bit32", "task",
         "Enum", "Vector2", "Vector3", "CFrame", "Instance", "Color3", "UDim", "UDim2", "RaycastParams", "OverlapParams",
-        "identifyexecutor", "getexecutorname", "sethiddenproperty", "setsimulationradius",
+        "firesignal", "identifyexecutor", "getexecutorname", "sethiddenproperty", "setsimulationradius",
     }) do permitted[key] = true end
     local context = setmetatable({}, {__index = function(_, key)
         if permitted[key] then return globals[key] or app.Environment[key] end
@@ -65,6 +65,7 @@ return function(app)
     context.UpdateMovementControlPanel = context.UpdateCameraControlPanel
     context.UpdateAnchorPanel = function(message) changed("ancla", message) end
     context.UpdateMoveAnchoredPanel = context.UpdateAnchorPanel
+    context.UpdateAutoAnchorPanel = context.UpdateAnchorPanel
     context.UpdateFling2Panel = function(message) changed("volar", message) end
     context.UpdateContactFlingPanel = function(message) changed("volar", message) end
     context.UpdateAdjustableContactFlingPanel = context.UpdateContactFlingPanel
@@ -76,7 +77,7 @@ return function(app)
             local connection = rawget(context, name)
             if connection then connection:Disconnect() end
         end
-        for _, name in ipairs({"SpectatorController", "FlightController", "MovementControlController", "XenoFlingReplicationAssist", "FlingReturnGuard", "AnchorForceReturn", "MobileAnchorV13Core", "StaticNoclipAnchorCore", "AnchorCore", "AdjustableContactFlingController", "ContactFlingController"}) do
+        for _, name in ipairs({"AutoAnchorCore", "SpectatorController", "FlightController", "MovementControlController", "XenoFlingReplicationAssist", "FlingReturnGuard", "AnchorForceReturn", "MobileAnchorV13Core", "StaticNoclipAnchorCore", "AnchorCore", "AdjustableContactFlingController", "ContactFlingController"}) do
             local controller = rawget(context, name)
             if name == "SpectatorController" and controller and not controller.Active then controller.Stop = function() end end
             if name == "FlightController" and controller and not controller.Flying then controller.Stop = function() end end

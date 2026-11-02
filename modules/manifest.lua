@@ -10,7 +10,7 @@ return {
         "ui/theme", "ui/components", "ui/edge_lights", "ui/controls", "ui/animation_picker", "core/features", "core/legacy_context", "ui/window", "ui/navigation",
     },
     legacy = {
-        "player/anchor", "player/anchor_force_return", "player/static_noclip_anchor",
+        "player/anchor", "player/anchor_force_return", "player/auto_skate_delta", "player/auto_skate_xeno", "player/anchor_auto", "player/static_noclip_anchor",
         "player/mobile_fall_guard", "player/mobile_anchor_v13", "player/fling2_efficient",
         "player/fling2_auto", "player/fling_return_guard", "player/contact_fling",
         "player/contact_fling_adjustable", "player/fling_car2_delta", "player/fling_car2_xeno",
