@@ -7,6 +7,28 @@ return function(context)
 	local mobile={Forward=false,Backward=false,Left=false,Right=false,Up=false,Down=false}
 	local connections={}
 	local heartbeat,cameraRender
+	local flightAnimation,flightTrack
+	local function stopFlightEmote()
+		if flightTrack then
+			pcall(function() flightTrack:Stop(0.15); flightTrack:Destroy() end)
+			flightTrack=nil
+		end
+		if flightAnimation then flightAnimation:Destroy();flightAnimation=nil end
+	end
+	local function playFlightEmote(humanoid)
+		stopFlightEmote()
+		local ok=pcall(function()
+			local animator=humanoid:FindFirstChildOfClass("Animator")
+			if not animator then animator=Instance.new("Animator");animator.Parent=humanoid end
+			flightAnimation=Instance.new("Animation")
+			flightAnimation.AnimationId="rbxassetid://76160231060388"
+			flightTrack=animator:LoadAnimation(flightAnimation)
+			flightTrack.Priority=Enum.AnimationPriority.Action
+			flightTrack.Looped=true
+			flightTrack:Play(0.15)
+		end)
+		if not ok then stopFlightEmote() end
+	end
 	local function character()
 		local c=player.Character
 		return c,c and c:FindFirstChild("HumanoidRootPart"),c and c:FindFirstChildOfClass("Humanoid")
@@ -121,6 +143,7 @@ return function(context)
 		local _,root,humanoid=character()
 		if not root or not humanoid then return false,isES and "Tu personaje no está disponible." or "Your character is unavailable." end
 		self.Flying=true; self.Braking=false; self.Velocity=Vector3.zero; self.Position=root.Position
+		playFlightEmote(humanoid)
 		humanoid.PlatformStand=true; humanoid.AutoRotate=false
 		root.AssemblyLinearVelocity=Vector3.zero; root.AssemblyAngularVelocity=Vector3.zero
 		if mobileFlightMode() then
@@ -158,6 +181,7 @@ return function(context)
 		return true
 	end
 	function Flight:Stop()
+		stopFlightEmote()
 		self.Flying=false; self.Braking=false; self.SprintExternal=false; self.Velocity=Vector3.zero; self.Position=nil
 		if heartbeat then heartbeat:Disconnect(); heartbeat=nil end
 		self:DisableMobileCamera()
@@ -166,6 +190,7 @@ return function(context)
 		if root then root.AssemblyLinearVelocity=Vector3.zero; root.AssemblyAngularVelocity=Vector3.zero end
 		if humanoid then humanoid.PlatformStand=false; humanoid.AutoRotate=true end
 	end
+	connections[#connections+1]=player.CharacterRemoving:Connect(stopFlightEmote)
 	local function setKey(input,value)
 		local key=input.KeyCode
 		if key==Enum.KeyCode.W then keys.W=value elseif key==Enum.KeyCode.S then keys.S=value elseif key==Enum.KeyCode.A then keys.A=value elseif key==Enum.KeyCode.D then keys.D=value elseif key==Enum.KeyCode.Space then keys.Up=value elseif key==Enum.KeyCode.LeftControl or key==Enum.KeyCode.C then keys.Down=value elseif key==Enum.KeyCode.LeftShift then keys.Sprint=value end

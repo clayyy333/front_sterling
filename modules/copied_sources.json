@@ -70,11 +70,6 @@
     "sha256": "d97dd48a7c9ff501a15f6e03b7a2c1147c0fdf2237ef23c1041957163d8efffb"
   },
   {
-    "source": "modules/player/flight_control.lua",
-    "copy": "modules/player/flight_control.lua",
-    "sha256": "660258459ef0db26c3950315736755a4bbfcc599d10b67f22460ff681149c9ee"
-  },
-  {
     "source": "modules/player/movement_control.lua",
     "copy": "modules/player/movement_control.lua",
     "sha256": "6340fdc23950ef5b7b4c49e6ee84e1afc2e4b302b62ddeffed3c79b9514637bb"
