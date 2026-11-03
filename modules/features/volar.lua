@@ -2,7 +2,7 @@ return function(app)
     local ui,f=app.UI,app.Flows.Volar
     app.Features:Register({Id="volar",Label="Volar",Title="Volar",Subtitle="Selecciona un modo y ajusta sus controles.",
         Mount=function(_,parent)
-            ui:Workspace(parent,{{"auto","Volar a Todos",124},{"short","Eficiente corto",124},{"contact","Por contacto",116},{"cars","Vehículos 2",108}},function(id,body,scope)
+            ui:Workspace(parent,{{"auto","Volar a Todos",124},{"efficient","Volar",88},{"short","Eficiente corto",124},{"contact","Por contacto",116},{"cars","Vehículos 2",108}},function(id,body,scope)
                 local stack=ui:Stack(body);local status=ui:Status(stack,scope)
                 if id=="auto"then
                     ui:Note(stack,"Recorrido automático de jugadores con el flujo eficiente corto.")
@@ -10,12 +10,30 @@ return function(app)
                         if v then return f.SinObjetivo:Start()else f.SinObjetivo:Stop();return true end
                     end)
                     ui:Action(stack,scope,"Forzar regreso",function()f.SinObjetivo:ForceReturn()end)
+                elseif id=="efficient"then
+                    local c=f.EficienteCorto
+                    ui:Players(stack,scope,"Seleccionar jugador",function(p)
+                        if c.Running then return end
+                        c:SetTarget(p)
+                    end)
+                    ui:Toggle(stack,scope,"Volar",function()return c.Running and not c:IsShortDisplacementEnabled()end,function(v)
+                        if v then
+                            if f.SinObjetivo.Running then f.SinObjetivo:Stop()end
+                            if c.Running then c:Stop()end
+                            if c.Stopping then return false,"Espera que termine el regreso antes de encender Volar."end
+                            c:SetShortDisplacementEnabled(false)
+                            return c:Start()
+                        else c:Stop();return true end
+                    end)
+                    ui:Action(stack,scope,"Forzar regreso",function()c:ForceReturn()end)
                 elseif id=="short"then
                     local c=f.EficienteCorto
                     ui:Players(stack,scope,"Seleccionar jugador",function(p)c:SetTarget(p)end)
-                    ui:Toggle(stack,scope,"Eficiente corto",function()return c.Running end,function(v)
+                    ui:Toggle(stack,scope,"Eficiente corto",function()return c.Running and c:IsShortDisplacementEnabled()end,function(v)
                         if v then
                             if f.SinObjetivo.Running then f.SinObjetivo:Stop()end
+                            if c.Running then c:Stop()end
+                            if c.Stopping then return false,"Espera que termine el regreso antes de encender Eficiente corto."end
                             c:SetShortDisplacementEnabled(true);return c:Start()
                         else c:Stop();return true end
                     end)

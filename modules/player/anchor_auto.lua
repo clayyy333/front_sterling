@@ -1,4 +1,4 @@
--- Coordinador de Ancla automatica.
+-- Coordinador de Ancla con asiento; variante Delta para Sterling.
 return function(context)
 	setfenv(1,context)
 	local Core={Mode=nil,Busy=false,Status=isES and "Ancla automática detenida." or "Automatic Anchor stopped."}
@@ -23,7 +23,7 @@ return function(context)
 		if (MobileAnchorCore and MobileAnchorCore:IsRunning()) or (MobileAnchorV11Core and MobileAnchorV11Core:IsRunning()) or (MobileAnchorV13Core and MobileAnchorV13Core:IsRunning()) then return false,isES and "Desactiva primero Muévete Anclado." or "Disable Move While Anchored first." end
 		if self.Busy then return false,isES and "Hay una operación en curso." or "An operation is in progress." end
 		if self.Mode then return self.Mode==mode,self.Mode==mode and nil or (isES and "Desactiva primero el otro modo." or "Disable the other mode first.") end
-		local engine=mode=="delta" and AutoSkateDelta or mode=="xeno" and AutoSkateXeno or nil
+		local engine=mode=="delta" and AutoSkateDelta or nil
 		if not engine then return false,"Modo inválido" end
 		self.Busy=true
 		update(isES and "Retirando el vehículo actual..." or "Removing current vehicle...")
@@ -36,7 +36,7 @@ return function(context)
 		if not ok then disableAnchorSuite(); self.Busy=false; update(err); return false,err end
 		self.Mode=mode
 		self.Busy=false
-		update(mode=="delta" and (isES and "Ancla con asiento Delta activa." or "Delta Seat Anchor active.") or (isES and "Ancla con asiento Xeno activa." or "Xeno Seat Anchor active."))
+		update(isES and "Ancla con asiento activa." or "Seat Anchor active.")
 		return true
 	end
 	function Core:PrepareForFling()
@@ -45,7 +45,7 @@ return function(context)
 		if not mode then return true end
 		self.Busy=true
 		update(isES and "Retirando el patín y conservando Ancla..." or "Removing skateboard and keeping Anchor...")
-		local engine=mode=="delta" and AutoSkateDelta or AutoSkateXeno
+		local engine=AutoSkateDelta
 		local removed,warning=engine:StopAndRemove()
 		self.Mode=nil
 		self.Busy=false
@@ -62,7 +62,7 @@ return function(context)
 		if mode then
 			self.Busy=true
 			update(isES and "Retirando el patín antes del fling con moto..." or "Removing skateboard before motorcycle fling...")
-			local engine=mode=="delta" and AutoSkateDelta or AutoSkateXeno
+			local engine=AutoSkateDelta
 			removed,warning=engine:StopAndRemove()
 			self.Mode=nil
 			self.Busy=false
@@ -78,7 +78,7 @@ return function(context)
 		if not mode then disableAnchorSuite(); return true end
 		self.Busy=true
 		update(isES and "Retirando el patín..." or "Removing skateboard...")
-		local engine=mode=="delta" and AutoSkateDelta or AutoSkateXeno
+		local engine=AutoSkateDelta
 		local removed,warning=engine:StopAndRemove()
 		update(isES and "Desactivando las protecciones de Ancla..." or "Disabling Anchor protections...")
 		disableAnchorSuite()
@@ -92,9 +92,8 @@ return function(context)
 		return self:Start(mode)
 	end
 	function Core:Destroy()
-		if self.Mode or AutoSkateDelta.Enabled or AutoSkateXeno.Enabled then self:Stop() else disableAnchorSuite() end
+		if self.Mode or AutoSkateDelta.Enabled then self:Stop() else disableAnchorSuite() end
 		AutoSkateDelta:Destroy()
-		AutoSkateXeno:Destroy()
 	end
 	AutoAnchorCore=Core
 	return true
