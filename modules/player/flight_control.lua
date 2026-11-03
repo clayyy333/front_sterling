@@ -8,26 +8,51 @@ return function(context)
 	local connections={}
 	local heartbeat,cameraRender
 	local flightAnimation,flightTrack
+	local emoteToken=0
+	local resolvedEmoteId
 	local function stopFlightEmote()
+		emoteToken=emoteToken+1
 		if flightTrack then
 			pcall(function() flightTrack:Stop(0.15); flightTrack:Destroy() end)
 			flightTrack=nil
 		end
 		if flightAnimation then flightAnimation:Destroy();flightAnimation=nil end
 	end
+	local function resolveFlightEmote()
+		if resolvedEmoteId then return resolvedEmoteId end
+		local ok,objects=pcall(function()return game:GetObjects("rbxassetid://76160231060388")end)
+		if ok and objects then
+			for _,item in ipairs(objects)do
+				local animation=item:IsA("Animation") and item or item:FindFirstChildWhichIsA("Animation",true)
+				if animation and animation.AnimationId~="" then resolvedEmoteId=animation.AnimationId end
+				item:Destroy()
+			end
+		end
+		return resolvedEmoteId or "rbxassetid://76160231060388"
+	end
 	local function playFlightEmote(humanoid)
 		stopFlightEmote()
-		local ok=pcall(function()
-			local animator=humanoid:FindFirstChildOfClass("Animator")
-			if not animator then animator=Instance.new("Animator");animator.Parent=humanoid end
-			flightAnimation=Instance.new("Animation")
-			flightAnimation.AnimationId="rbxassetid://76160231060388"
-			flightTrack=animator:LoadAnimation(flightAnimation)
-			flightTrack.Priority=Enum.AnimationPriority.Action
-			flightTrack.Looped=true
-			flightTrack:Play(0.15)
+		local token=emoteToken
+		task.spawn(function()
+			local ok,problem=pcall(function()
+				local id=resolveFlightEmote()
+				if token~=emoteToken or not Flight.Flying or not humanoid.Parent then return end
+				local animator=humanoid:FindFirstChildOfClass("Animator")
+				if not animator then animator=Instance.new("Animator");animator.Parent=humanoid end
+				flightAnimation=Instance.new("Animation")
+				flightAnimation.AnimationId=id
+				local track=animator:LoadAnimation(flightAnimation)
+				if token~=emoteToken or not Flight.Flying then track:Destroy();return end
+				flightTrack=track
+				track.Priority=Enum.AnimationPriority.Action4
+				track.Looped=true
+				track:Play(0.15)
+			end)
+			if not ok and token==emoteToken then
+				stopFlightEmote()
+				warn("Sterling: no se pudo reproducir el emote de vuelo: "..tostring(problem))
+			end
 		end)
-		if not ok then stopFlightEmote() end
 	end
 	local function character()
 		local c=player.Character
