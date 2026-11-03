@@ -114,6 +114,37 @@ return function(app)
         clampLauncher()
         if self.OnLayout then self.OnLayout(self.Compact) end
     end
+    function controller:OpenBook()
+        local position=window.Position
+        local clip=ui:Create("Frame",{Name="WindowBookOpening",AnchorPoint=Vector2.new(.5,.5),
+            Position=position,Size=UDim2.fromOffset(2,height+96),BackgroundTransparency=1,
+            BorderSizePixel=0,ClipsDescendants=true},gui)
+        local progress=ui:Create("NumberValue",{Value=0},clip)
+        window.Parent=clip;window.Position=UDim2.fromScale(.5,.5)
+        local tween=game:GetService("TweenService"):Create(progress,
+            TweenInfo.new(.6,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),{Value=1})
+        local changed=progress:GetPropertyChangedSignal("Value"):Connect(function()
+            clip.Size=UDim2.fromOffset(math.max(2,(width+96)*progress.Value),height+96)
+        end)
+        -- Edge lights are siblings of the window during normal use.
+        -- Hide them until the reveal finishes so the outline cannot appear early.
+        local lights=gui:FindFirstChild("WindowEdgeLights")
+        if lights then lights.Parent=clip end
+        local cleaned=false
+        local function finish()
+            if cleaned then return end
+            cleaned=true;tween:Cancel();changed:Disconnect()
+            if app.Alive then
+                window.Parent=gui;window.Position=position
+                if lights then lights.Parent=gui end
+            end
+            clip:Destroy()
+        end
+        app:OnCleanup(finish)
+        gui.Enabled=true
+        tween:Play();tween.Completed:Wait()
+        finish()
+    end
     function controller:Center() window.Position = UDim2.fromScale(.5, .5) end
     function controller:SetTitle(title, detail)
         local hasTitle=title~=nil and title~=""

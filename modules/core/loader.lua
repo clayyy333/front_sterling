@@ -66,8 +66,14 @@ return function(read, environment)
         end
         progress(1,"Sterling está listo")
         splash:Yield(true);check()
+        if splash.CloseBook then splash:CloseBook()end
+        check()
+        splash:Destroy()
         app.Loading=false
-        if app.Window then app.Window.Gui.Enabled=true end
+        if app.Window then
+            if app.Window.OpenBook then app.Window:OpenBook()
+            else app.Window.Gui.Enabled=true end
+        end
         environment.SterlingApp=app
     end,debug.traceback)
     if not ok then

@@ -140,6 +140,14 @@ return function(environment)
         percent.Text=tostring(math.floor(self.Value*100)).."%"
         status.Text="Cargando...";self:Yield()
     end
+    function controller:CloseBook()
+        if self.Destroyed then return end
+        openingTween:Cancel()
+        local closingTween=tweenService:Create(opening,
+            TweenInfo.new(.6,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),{Value=0})
+        borderTweens[#borderTweens+1]=closingTween
+        closingTween:Play();closingTween.Completed:Wait()
+    end
     function controller:Fail()
         if self.Destroyed then return end
         status.Text="No se pudo completar la carga. Vuelve a ejecutar."
