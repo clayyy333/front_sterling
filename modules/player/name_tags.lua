@@ -25,6 +25,8 @@ return function(app)
                 if not head or not head:IsA("BasePart")or entry.Tag then return end
                 local tag=Instance.new("BillboardGui")
                 tag.Name="LaMadrinaNameTag";tag.Adornee=head
+                -- PlayerGui elimina los LayerCollector al reaparecer si esta propiedad queda activa.
+                tag.ResetOnSpawn=false
                 tag.Size=UDim2.fromOffset(206,54);tag.StudsOffsetWorldSpace=Vector3.new(0,2.3,0)
                 tag.MaxDistance=120;tag.AlwaysOnTop=false;tag.LightInfluence=0
                 tag.Parent=app.PlayerGui;entry.Tag=tag
