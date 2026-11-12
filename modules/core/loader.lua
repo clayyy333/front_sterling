@@ -75,6 +75,17 @@ return function(read, environment)
             else app.Window.Gui.Enabled=true end
         end
         environment.SterlingApp=app
+        -- Fetch presence only after the main window has finished opening.
+        if game.GameId==4540138978 and app.Window and app.Alive then
+            task.defer(function()
+                if not app.Alive then return end
+                local presenceOk,presenceError=pcall(function()
+                    local factory=compile("modules/core/presence.lua")()
+                    if app.Alive then app.Modules["core/presence"]=factory(app) end
+                end)
+                if not presenceOk then warn("Sterling presence: "..tostring(presenceError))end
+            end)
+        end
     end,debug.traceback)
     if not ok then
         if app and app.Destroy then app:Destroy() end
