@@ -2,11 +2,31 @@
 return function(app)
     local state={Status="disabled"}
     if game.GameId~=4540138978 or not app.Alive or app.Loading then return state end
-    local env=app.Environment or {}
-    local requestFn=env.request or env.http_request or env.httprequest
-        or (env.syn and env.syn.request) or (env.http and env.http.request)
-        or request or http_request or (syn and syn.request)
-    if type(requestFn)~="function" then state.Status="request_unavailable";return state end
+    local function report(message)
+        state.LastError=message
+        if state.ReportedError~=message then
+            state.ReportedError=message
+            warn("Sterling presence: "..message)
+        end
+    end
+    local function resolve(env)
+        if type(env)~="table"then return end
+        for _,key in ipairs({"request","http_request","httprequest"})do
+            if type(env[key])=="function"then return env[key]end
+        end
+        for _,key in ipairs({"syn","http"})do
+            if type(env[key])=="table"and type(env[key].request)=="function"then return env[key].request end
+        end
+    end
+    local requestFn=resolve(app.Environment)
+    if not requestFn and type(getgenv)=="function"then
+        local ok,env=pcall(getgenv);if ok then requestFn=resolve(env)end
+    end
+    if not requestFn and type(getfenv)=="function"then
+        local ok,env=pcall(getfenv,0);if ok then requestFn=resolve(env)end
+    end
+    requestFn=requestFn or resolve({request=request,http_request=http_request,httprequest=httprequest,syn=syn,http=http})
+    if not requestFn then state.Status="request_unavailable";report("No hay una funcion HTTP compatible en el ejecutor.");return state end
     local http=app.Services.HttpService
     local token,closed=nil,false
     local base="https://strikechat-api.onrender.com"
@@ -17,9 +37,14 @@ return function(app)
             return requestFn({Url=base.."/api/v1/sessions/"..path,Method="POST",
                 Headers=headers,Body=http:JSONEncode(body),Timeout=8})
         end)
-        if not ok or type(response)~="table" then return nil end
+        if not ok or type(response)~="table" then
+            report("Fallo de transporte en sessions/"..path);return nil
+        end
         local status=tonumber(response.StatusCode or response.Status or response.status_code)or 0
-        if status<200 or status>=300 then return nil,status end
+        state.LastHttpStatus=status
+        if status<200 or status>=300 then
+            report("HTTP "..status.." en sessions/"..path);return nil,status
+        end
         local decoded,value=pcall(function()return http:JSONDecode(response.Body or response.body or "{}")end)
         return decoded and type(value)=="table" and value or {},status
     end
@@ -43,7 +68,8 @@ return function(app)
                     game_name="Metro Life",script_version="script_sterling"})
                 if result and type(result.session_token)=="string" then
                     if closed or not app.Alive then finish(result.session_token);return end
-                    token=result.session_token;retry=5;state.Status="online"
+                    token=result.session_token;retry=5;state.Status="online";state.LastError=nil
+                    print("Sterling presence: sesion script_sterling registrada en Metro Life.")
                 else
                     state.Status="retrying"
                 end

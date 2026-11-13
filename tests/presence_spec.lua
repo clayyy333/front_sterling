@@ -38,3 +38,15 @@ factory(app)
 assert(coroutine.resume(table.remove(queued,1)))
 assert(#calls==2 and calls[2].Headers.Authorization=="Bearer late-token")
 print("Presence OK: Metro/loading gates, asynchronous start, source, cleanup and late response")
+-- Executor APIs may exist only in getgenv; ignore non-function placeholders.
+queued={};calls={};app.Environment={request=true};warn=function()end
+getgenv=function()return {http_request=function(opts)
+    calls[#calls+1]=opts
+    return {StatusCode=403,Body={}}
+end}end
+local failed=factory(app)
+assert(coroutine.resume(table.remove(queued,1)))
+assert(#calls==1 and failed.LastHttpStatus==403)
+assert(failed.LastError=="HTTP 403 en sessions/start")
+cleanup()
+getgenv=nil
