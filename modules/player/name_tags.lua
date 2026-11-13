@@ -1,4 +1,4 @@
--- Etiquetas locales: se actualizan por eventos, sin recorrer personajes cada frame.
+-- Etiquetas locales por eventos, con reconciliación ligera una vez por segundo.
 return function(app)
     local players=app.Services.Players
     local core={Enabled=false}
@@ -10,19 +10,23 @@ return function(app)
     local function remove(account)
         local entry=entries[account];if not entry then return end
         disconnect(entry.Connections)
+        disconnect(entry.CharacterConnections)
         if entry.Tag then entry.Tag:Destroy()end
         entries[account]=nil
     end
     local function watch(account)
         if account==app.Player or entries[account]then return end
-        local entry={Connections={}};entries[account]=entry
+        local entry={Connections={},CharacterConnections={}};entries[account]=entry
         local function attach(character)
-            if entry.CharacterConnection then entry.CharacterConnection:Disconnect();entry.CharacterConnection=nil end
+            disconnect(entry.CharacterConnections)
             if entry.Tag then entry.Tag:Destroy();entry.Tag=nil end
+            entry.Character=character;entry.Refresh=nil
             local function create()
                 if not core.Enabled or entries[account]~=entry or account.Character~=character then return end
                 local head=character:FindFirstChild("Head")
-                if not head or not head:IsA("BasePart")or entry.Tag then return end
+                if entry.Tag and entry.Tag.Parent and entry.Tag.Adornee==head and head and head.Parent==character then return end
+                if entry.Tag then entry.Tag:Destroy();entry.Tag=nil;entry.Display=nil end
+                if not head or not head:IsA("BasePart")then return end
                 local tag=Instance.new("BillboardGui")
                 tag.Name="LaMadrinaNameTag";tag.Adornee=head
                 -- PlayerGui elimina los LayerCollector al reaparecer si esta propiedad queda activa.
@@ -53,12 +57,20 @@ return function(app)
                 entry.Display.Text=account.DisplayName
                 label(26,16,11,Color3.fromRGB(185,182,192),Enum.Font.Gotham).Text="@"..account.Name
             end
+            entry.Refresh=create
+            entry.CharacterConnections[#entry.CharacterConnections+1]=character.ChildAdded:Connect(create)
+            entry.CharacterConnections[#entry.CharacterConnections+1]=character.ChildRemoved:Connect(create)
             create()
-            entry.CharacterConnection=character.ChildAdded:Connect(create)
+        end
+        entry.Reconcile=function()
+            if account.Character~=entry.Character then
+                if account.Character then attach(account.Character)end
+            elseif entry.Refresh then entry.Refresh()end
         end
         entry.Connections[#entry.Connections+1]=account.CharacterAdded:Connect(attach)
         entry.Connections[#entry.Connections+1]=account.CharacterRemoving:Connect(function()
-            if entry.CharacterConnection then entry.CharacterConnection:Disconnect();entry.CharacterConnection=nil end
+            disconnect(entry.CharacterConnections)
+            entry.Character=nil;entry.Refresh=nil;entry.Display=nil
             if entry.Tag then entry.Tag:Destroy();entry.Tag=nil end
         end)
         entry.Connections[#entry.Connections+1]=account:GetPropertyChangedSignal("DisplayName"):Connect(function()
@@ -69,7 +81,6 @@ return function(app)
     local function clear()
         disconnect(connections)
         for account,entry in pairs(entries)do
-            if entry.CharacterConnection then entry.CharacterConnection:Disconnect()end
             remove(account)
         end
     end
@@ -81,11 +92,19 @@ return function(app)
             if value then
                 connections[#connections+1]=players.PlayerAdded:Connect(watch)
                 connections[#connections+1]=players.PlayerRemoving:Connect(function(account)
-                    local entry=entries[account]
-                    if entry and entry.CharacterConnection then entry.CharacterConnection:Disconnect()end
                     remove(account)
                 end)
                 for _,account in ipairs(players:GetPlayers())do watch(account)end
+                local elapsed=0
+                connections[#connections+1]=game:GetService("RunService").Heartbeat:Connect(function(dt)
+                    elapsed=elapsed+dt;if elapsed<1 then return end;elapsed=0
+                    if not self.Enabled or not app.Alive then return end
+                    for _,account in ipairs(players:GetPlayers())do
+                        watch(account)
+                        local entry=entries[account]
+                        if entry then entry.Reconcile()end
+                    end
+                end)
             end
         end
         app.Storage.Values.ShowPlayerNames=value;app.Storage:Save();return true
